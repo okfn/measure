@@ -1,5 +1,8 @@
 # Measure
 
+[![Travis](https://img.shields.io/travis/okfn/measure/master.svg)](https://travis-ci.org/okfn/measure)
+[![Coveralls](http://img.shields.io/coveralls/okfn/measure.svg?branch=master)](https://coveralls.io/r/okfn/measure?branch=master)
+
 ## What
 
 Measure is scripts and conventions to build KPI dashboards for projects.
