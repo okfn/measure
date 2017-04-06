@@ -18,7 +18,7 @@ def read(*paths):
 
 
 # Prepare
-PACKAGE = 'measure'
+PACKAGE = 'datapackage_pipelines_measure'
 NAME = PACKAGE.replace('_', '-')
 INSTALL_REQUIRES = [
     'six>=1.9',
