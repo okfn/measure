@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division
-from __future__ import print_function
-from __future__ import absolute_import
 
 import os
 import io
@@ -21,7 +18,6 @@ def read(*paths):
 PACKAGE = 'datapackage_pipelines_measure'
 NAME = PACKAGE.replace('_', '-')
 INSTALL_REQUIRES = [
-    'six>=1.9',
 ]
 TESTS_REQUIRE = [
     'pylama',
