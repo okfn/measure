@@ -1,1 +1,1 @@
--e git+ssh://git@github.com/frictionlessdata/datapackage-pipelines.git#egg=datapackage-pipelines
+-e git+git://github.com/frictionlessdata/datapackage-pipelines.git#egg=datapackage-pipelines
