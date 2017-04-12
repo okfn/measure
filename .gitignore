@@ -92,4 +92,4 @@ ENV/
 .idea/
 *iml
 .dpp.db
-
+settings_dev.py

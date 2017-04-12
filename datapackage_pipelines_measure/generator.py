@@ -8,6 +8,8 @@ from datapackage_pipelines.generators import (
     SCHEDULE_NONE
 )
 
+from .config import settings
+
 import logging
 log = logging.getLogger(__name__)
 
@@ -31,11 +33,14 @@ class Generator(GeneratorBase):
             pipeline_id = slugify('{}-{}'.format(source['project'], k))
             schedule = SCHEDULE_NONE
 
+            # Mock pipeline step, to be replaced with real ones later. Likely
+            # broken out into separate modules.
             if k == 'social-media':
                 pipeline_steps = steps(*[
                     ('add_metadata', {
                         'project': metadata_project,
-                        'name': pipeline_id
+                        'name': pipeline_id,
+                        'github': settings.GITHUB_API_BASE_URL
                     }),
                     ('add_resource', {
                         'name': 'test_resource',

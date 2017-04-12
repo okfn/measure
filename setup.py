@@ -59,4 +59,9 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
+    entry_points={
+        'console_scripts': [
+            'measure-dpp = datapackage_pipelines_measure.cli:main'
+        ]
+    }
 )
