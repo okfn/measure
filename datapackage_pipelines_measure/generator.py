@@ -15,15 +15,15 @@ log = logging.getLogger(__name__)
 
 
 ROOT_PATH = os.path.join(os.path.dirname(__file__), '..')
-SOCIALMEDIA_SCHEMA_FILE = os.path.join(
-    os.path.dirname(__file__), 'schemas/socialmedia_schema.json')
+SCHEMA_FILE = os.path.join(
+    os.path.dirname(__file__), 'schemas/measure_spec_schema.json')
 
 
 class Generator(GeneratorBase):
 
     @classmethod
     def get_schema(cls):
-        return json.load(open(SOCIALMEDIA_SCHEMA_FILE))
+        return json.load(open(SCHEMA_FILE))
 
     @classmethod
     def generate_pipeline(cls, source):
