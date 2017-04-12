@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "project": { "type": "string" },
+    "config": {
+        "type": "object",
+        "properties": {
+            "social-media": {"type": "object"},
+            "code-hosting": {"type": "object"},
+            "code-packaging": {"type": "object"}
+        }
+    }
+  },
+  "required": ["project", "config"]
+}
