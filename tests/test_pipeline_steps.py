@@ -9,10 +9,9 @@ from datapackage_pipelines_measure import Generator
 
 class TestPipelineSteps(unittest.TestCase):
 
-    '''Test that all submodules of the pipeline_steps module contain the
-    expected properties and functions.'''
-
     def test_modules_contain_expected_items(self):
+        '''Test that all submodules of the pipeline_steps module contain the
+        expected properties and functions.'''
         pkgpath = os.path.dirname(pipeline_steps.__file__)
 
         pipeline_modules = [getattr(pipeline_steps, name) for _, name, _
@@ -49,3 +48,21 @@ class TestPipelineSteps(unittest.TestCase):
         # example pipeline adds metadata
         assert {'run': 'add_metadata', 'parameters': {'foo': 'bar'}} \
             in pipeline_details['pipeline']
+
+    def test_pipeline_generator_no_support(self):
+        '''Test the Generator.generate_pipeline logs warning when no steps
+        available to support source type.'''
+        source = {
+            'project': 'my-project',
+            'config': {
+                'not-supported': {}
+            }
+        }
+
+        logger = 'datapackage_pipelines_measure.generator'
+        msg = 'No not-supported pipeline generator available for my-project'
+        with self.assertLogs(logger,
+                             level='WARN') as cm:
+            gen = list(Generator.generate_pipeline(source))
+            self.assertEqual(cm.output, ['WARNING:{}:{}'.format(logger, msg)])
+            assert len(gen) is 0
