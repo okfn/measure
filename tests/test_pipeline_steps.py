@@ -4,6 +4,7 @@ import unittest
 import inspect
 
 from datapackage_pipelines_measure import pipeline_steps
+from datapackage_pipelines_measure import Generator
 
 
 class TestPipelineSteps(unittest.TestCase):
@@ -27,3 +28,24 @@ class TestPipelineSteps(unittest.TestCase):
             sig = inspect.signature(module.add_steps)
             sig_args = [a for a in sig.parameters]
             assert sig_args == ['steps', 'pipeline_id']
+
+    def test_pipeline_generator(self):
+        '''Test the Generator.generate_pipeline method yields as expected for a
+        given source input.'''
+        source = {
+            'project': 'example-project',
+            'config': {
+                'example': {}
+            }
+        }
+
+        gen = list(Generator.generate_pipeline(source))
+        pipeline_id, pipeline_details = gen[0]
+        assert len(gen) is 1
+        # pipeline id
+        assert pipeline_id == 'example-project-example'
+        # pipeline details
+        assert 'pipeline' in pipeline_details.keys()
+        # example pipeline adds metadata
+        assert {'run': 'add_metadata', 'parameters': {'foo': 'bar'}} \
+            in pipeline_details['pipeline']
