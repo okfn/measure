@@ -1,17 +1,12 @@
 import os
 
-from ..config import settings
-
 ROOT_PATH = os.path.join(os.path.dirname(__file__), '..', '..')
 
 label = 'social-media'
 
 
-def add_steps(steps: list, pipeline_id: str) -> list:
+def add_steps(steps: list, pipeline_id: str, config: dict) -> list:
     return steps + [
-        ('add_metadata', {
-            'github': settings.GITHUB_API_BASE_URL
-        }),
         ('add_resource', {
             'name': 'test_resource',
             'url': 'https://docs.google.com/spreadsheets/d/' +

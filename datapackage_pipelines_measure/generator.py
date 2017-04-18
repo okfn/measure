@@ -63,7 +63,9 @@ class Generator(GeneratorBase):
                     })
                 ]
 
-                k_steps = discovered_steps[k](common_steps, pipeline_id)
+                k_steps = discovered_steps[k](common_steps,
+                                              pipeline_id,
+                                              config)
                 _steps = steps(*k_steps)
             else:
                 log.warn('No {} pipeline generator available for {}'.format(
