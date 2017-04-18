@@ -18,7 +18,8 @@ def read(*paths):
 PACKAGE = 'datapackage_pipelines_measure'
 NAME = PACKAGE.replace('_', '-')
 INSTALL_REQUIRES = [
-    'datapackage-pipelines'
+    'datapackage-pipelines',
+    'psycopg2'
 ]
 TESTS_REQUIRE = [
     'pylama',

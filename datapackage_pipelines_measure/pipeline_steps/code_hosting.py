@@ -52,4 +52,13 @@ def add_steps(steps: list, pipeline_id: str, config: dict) -> list:
         'out-path': '{}/{}'.format(DOWNLOADS_PATH, pipeline_id)
     }))
 
+    steps.append(('dump.to_sql', {
+        'engine': settings.DB_ENGINE,
+        'tables': {
+            'codehosting': {
+                'resource-name': 'code-hosting'
+            }
+        }
+    }))
+
     return steps
