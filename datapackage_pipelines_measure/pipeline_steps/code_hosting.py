@@ -47,6 +47,8 @@ def add_steps(steps: list, pipeline_id: str, config: dict) -> list:
         }
     }))
 
+    steps.append(('measure.add_timestamp'))
+
     # temporarily dump to path for development
     steps.append(('dump.to_path', {
         'out-path': '{}/{}'.format(DOWNLOADS_PATH, pipeline_id)
