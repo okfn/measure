@@ -1,24 +1,55 @@
 import os
 
+from datapackage_pipelines.generators import slugify
 
-ROOT_PATH = os.path.join(os.path.dirname(__file__), '..', '..')
+from datapackage_pipelines_measure.config import settings
 
+DOWNLOADS_PATH = os.path.join(os.path.dirname(__file__), '../../downloads')
 
 label = 'code-hosting'
 
 
-def add_steps(steps: list, pipeline_id: str) -> list:
-    return steps + [
-        ('add_resource', {
-            'name': 'test_resource',
-            'url': 'https://docs.google.com/spreadsheets/d/' +
-            '1vbhTuMDNCmxdo2rPkkya9v6X1f9eyqvSGsY5YcxlcLk/' +
-            'edit#gid=0'
-        }),
-        ('stream_remote_resources', {}),
-        ('measure.capitalise', {}),
-        ('dump.to_path', {
-            'out-path':
-                '{}/downloads/{}'.format(ROOT_PATH, pipeline_id)
-        })
-    ]
+def add_steps(steps: list, pipeline_id: str, config: dict) -> list:
+    for repo in config['github']['repositories']:
+        steps.append(('measure.add_github_resource', {
+            'name': slugify(repo),
+            'repo': repo,
+            'map_fields': {
+                'repository': 'name',
+                'watchers': 'subscribers_count',
+                'stars': 'stargazers_count'
+            }
+        }))
+
+    steps.append(('concatenate', {
+        'sources':
+            [slugify(repo) for repo in config['github']['repositories']],
+        'target': {
+            'name': 'code-hosting',
+            'path': 'data/code-hosting.json'},
+        'fields': {
+            'repository': [],
+            'watchers': [],
+            'stars': []}
+    }))
+
+    steps.append(('set_types', {
+        'types': {
+            'repository': {
+                'type': 'string',
+            },
+            'watchers': {
+                'type': 'integer'
+            },
+            'stars': {
+                'type': 'integer'
+            }
+        }
+    }))
+
+    # temporarily dump to path for development
+    steps.append(('dump.to_path', {
+        'out-path': '{}/{}'.format(DOWNLOADS_PATH, pipeline_id)
+    }))
+
+    return steps
