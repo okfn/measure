@@ -16,6 +16,7 @@ def modify_datapackage(datapackage, parameters, stats):
         'unique': True
       }
     })
+    datapackage['resources'][0]['schema']['primaryKey'] = 'id'
     return datapackage
 
 
