@@ -5,7 +5,8 @@ ROOT_PATH = os.path.join(os.path.dirname(__file__), '..', '..')
 label = 'social-media'
 
 
-def add_steps(steps: list, pipeline_id: str, config: dict) -> list:
+def add_steps(steps: list, pipeline_id: str,
+              project_id: str, config: dict) -> list:
     return steps + [
         ('add_resource', {
             'name': 'test_resource',

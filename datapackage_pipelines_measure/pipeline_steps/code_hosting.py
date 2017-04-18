@@ -9,7 +9,8 @@ DOWNLOADS_PATH = os.path.join(os.path.dirname(__file__), '../../downloads')
 label = 'code-hosting'
 
 
-def add_steps(steps: list, pipeline_id: str, config: dict) -> list:
+def add_steps(steps: list, pipeline_id: str,
+              project_id: str, config: dict) -> list:
     for repo in config['github']['repositories']:
         steps.append(('measure.add_github_resource', {
             'name': slugify(repo),
@@ -47,6 +48,7 @@ def add_steps(steps: list, pipeline_id: str, config: dict) -> list:
         }
     }))
 
+    steps.append(('measure.add_project_name', {'name': project_id}))
     steps.append(('measure.add_timestamp'))
     steps.append(('measure.add_uuid'))
 
