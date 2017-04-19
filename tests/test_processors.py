@@ -87,7 +87,7 @@ class MeasureProcessorsFixturesTest_Timestamp(MeasureProcessorsFixturesTest):
         assert 'timestamp' in actual_json
         try:
             datetime.datetime.strptime(actual_json['timestamp'],
-                                       '%d-%m-%Y %H:%M:%S')
+                                       '%Y-%m-%dT%H:%M:%SZ')
         except ValueError:
             assert False, \
                 "Timestamp must be a datetime in the correct format"

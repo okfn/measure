@@ -30,8 +30,9 @@ add_timestamp
             "type": "string"
           },
           {
+            "format": "%Y-%m-%dT%H:%M:%SZ",
             "name": "timestamp",
-            "type": "string"
+            "type": "datetime"
           }
         ]
       }

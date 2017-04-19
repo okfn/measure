@@ -11,7 +11,8 @@ log = logging.getLogger(__name__)
 def modify_datapackage(datapackage, parameters, stats):
     datapackage['resources'][0]['schema']['fields'].append({
       'name': 'timestamp',
-      'type': 'string'
+      'type': 'datetime',
+      'format': '{}'.format(settings.TIMESTAMP_DEFAULT_FORMAT)
     })
     return datapackage
 
