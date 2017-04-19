@@ -20,8 +20,11 @@ repo_url = '{}{}?access_token={}'.format(settings.GITHUB_API_BASE_URL,
                                          repo,
                                          settings.GITHUB_API_TOKEN)
 
-# What if not json response?
-repo_content = requests.get(repo_url).json()
+try:
+    repo_content = requests.get(repo_url).json()
+except json.decoder.JSONDecodeError:
+    log.error('Expected JSON in response from: {}'.format(repo_url))
+    raise
 
 # remap retrieved dict to scheme in parameters
 resource_content = {t_key: repo_content[s_key]
