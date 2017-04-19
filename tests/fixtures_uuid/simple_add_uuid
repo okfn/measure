@@ -1,0 +1,50 @@
+add_uuid
+--
+{}
+--
+{
+    "name": "test",
+    "resources": [
+        {
+            "name": "hello-world",
+            "path": "hi.csv",
+            "schema": { "fields": [
+                {"name": "hello", "type": "string"}
+            ]}
+        }
+    ]
+}
+--
+{"hello": "world"}
+--
+{
+  "name": "test",
+  "resources": [
+    {
+      "name": "hello-world",
+      "path": "hi.csv",
+      "schema": {
+        "fields": [
+          {
+            "name": "hello",
+            "type": "string"
+          },
+          {
+            "constraints": {
+              "required": true,
+              "unique": true
+            },
+            "format": "uuid",
+            "name": "id",
+            "type": "string"
+          }
+        ],
+        "primaryKey": "id"
+      }
+    }
+  ]
+}
+--
+{"hello": "World"}
+
+{}

@@ -1,0 +1,44 @@
+add_timestamp
+--
+{}
+--
+{
+    "name": "test",
+    "resources": [
+        {
+            "name": "hello-world",
+            "path": "hi.csv",
+            "schema": { "fields": [
+                {"name": "hello", "type": "string"}
+            ]}
+        }
+    ]
+}
+--
+{"hello": "world"}
+--
+{
+  "name": "test",
+  "resources": [
+    {
+      "name": "hello-world",
+      "path": "hi.csv",
+      "schema": {
+        "fields": [
+          {
+            "name": "hello",
+            "type": "string"
+          },
+          {
+            "name": "timestamp",
+            "type": "string"
+          }
+        ]
+      }
+    }
+  ]
+}
+--
+{"hello": "World"}
+
+{}
