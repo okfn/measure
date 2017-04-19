@@ -28,3 +28,17 @@ We have demonstrated the value of this data collection as part of the project li
 The main change here is having a clean, openly available codebase, and using a more suitable database and dashboard builder, as well as adding additional collectors.
 
 Potentially, we'd love to see interest from other non-profits who receive funds to execute on projects, and would like a simple yet systematic way to collect data on what they do.
+
+## Installation
+
+### Environmental Variables
+
+#### General
+
+- `MEASURE_DB_ENGINE`: Location of SQL database as a URL Schema
+- `MEASURE_TIMESTAMP_DEFAULT_FORMAT`: datetime format used for `timestamp` value. Currently must be `%Y-%m-%dT%H:%M:%SZ`.
+
+#### Github
+
+- `MEASURE_GITHUB_API_BASE_URL`: Github api base url (`https://api.github.com/repos/`)
+- `MEASURE_GITHUB_API_TOKEN`: Github api token used for making requests
