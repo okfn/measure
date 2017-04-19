@@ -61,7 +61,8 @@ def add_steps(steps: list, pipeline_id: str,
         'engine': settings.DB_ENGINE,
         'tables': {
             'codehosting': {
-                'resource-name': 'code-hosting'
+                'resource-name': 'code-hosting',
+                'mode': 'append'
             }
         }
     }))
