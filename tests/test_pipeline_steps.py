@@ -26,7 +26,10 @@ class TestPipelineSteps(unittest.TestCase):
             assert callable(module.add_steps), 'add_steps must be callable'
             sig = inspect.signature(module.add_steps)
             sig_args = [a for a in sig.parameters]
-            assert sig_args == ['steps', 'pipeline_id']
+            assert sig_args == ['steps', 'pipeline_id', 'project_id', 'config']
+
+
+class TestPipelineGenerator(unittest.TestCase):
 
     def test_pipeline_generator(self):
         '''Test the Generator.generate_pipeline method yields as expected for a

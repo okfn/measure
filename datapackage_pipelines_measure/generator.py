@@ -46,7 +46,7 @@ class Generator(GeneratorBase):
 
     @classmethod
     def generate_pipeline(cls, source):
-        metadata_project = slugify(source['project'])
+        project_id = slugify(source['project'])
         schedule = None
 
         discovered_steps = cls._get_pipeline_steps()
@@ -54,20 +54,23 @@ class Generator(GeneratorBase):
         for k, config in source['config'].items():
             # `k` corresponds with `label` in pipeline_steps module.
             if k in discovered_steps.keys():
-                pipeline_id = slugify('{}-{}'.format(source['project'], k))
+                pipeline_id = slugify('{}-{}'.format(project_id, k))
 
                 common_steps = [
                     ('add_metadata', {
-                        'project': metadata_project,
+                        'project': project_id,
                         'name': pipeline_id
                     })
                 ]
 
-                k_steps = discovered_steps[k](common_steps, pipeline_id)
+                k_steps = discovered_steps[k](common_steps,
+                                              pipeline_id,
+                                              project_id,
+                                              config)
                 _steps = steps(*k_steps)
             else:
                 log.warn('No {} pipeline generator available for {}'.format(
-                    k, metadata_project))
+                    k, project_id))
                 continue
 
             pipeline_details = {

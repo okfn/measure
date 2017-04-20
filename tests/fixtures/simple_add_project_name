@@ -1,0 +1,49 @@
+add_project_name
+--
+{
+    "name": "my-project"
+}
+--
+{
+    "name": "test",
+    "resources": [
+        {
+            "name": "hello-world",
+            "path": "hi.csv",
+            "schema": { "fields": [
+                {"name": "hello", "type": "string"}
+            ]}
+        }
+    ]
+}
+--
+{"hello": "world"}
+--
+{
+  "name": "test",
+  "resources": [
+    {
+      "name": "hello-world",
+      "path": "hi.csv",
+      "schema": {
+        "fields": [
+          {
+            "name": "hello",
+            "type": "string"
+          },
+          {
+            "constraints": {
+              "required": true
+            },
+            "name": "project_id",
+            "type": "string"
+          }
+        ]
+      }
+    }
+  ]
+}
+--
+{"hello": "world", "project_id": "my-project"}
+
+{}
