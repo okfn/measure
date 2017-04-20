@@ -4,9 +4,6 @@ from datapackage_pipelines.wrapper import process
 
 from datapackage_pipelines_measure.config import settings
 
-import logging
-log = logging.getLogger(__name__)
-
 
 NOW = datetime.datetime.now().strftime(settings.TIMESTAMP_DEFAULT_FORMAT)
 
