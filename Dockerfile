@@ -5,6 +5,6 @@ ADD . /app
 WORKDIR /app
 RUN pip install .
 
-WORKDIR /app/pipelines
+WORKDIR /app/projects
 
 CMD ["server"]
