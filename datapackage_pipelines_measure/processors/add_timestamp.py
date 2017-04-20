@@ -8,6 +8,9 @@ import logging
 log = logging.getLogger(__name__)
 
 
+NOW = datetime.datetime.now().strftime(settings.TIMESTAMP_DEFAULT_FORMAT)
+
+
 def modify_datapackage(datapackage, parameters, stats):
     datapackage['resources'][0]['schema']['fields'].append({
       'name': 'timestamp',
@@ -18,8 +21,7 @@ def modify_datapackage(datapackage, parameters, stats):
 
 
 def process_row(row, *args):
-    now = datetime.datetime.now().strftime(settings.TIMESTAMP_DEFAULT_FORMAT)
-    row['timestamp'] = now
+    row['timestamp'] = NOW
     return row
 
 
