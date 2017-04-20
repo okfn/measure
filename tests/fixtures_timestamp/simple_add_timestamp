@@ -40,6 +40,4 @@ add_timestamp
   ]
 }
 --
-{"hello": "World"}
-
-{}
+# expected output tested in test method

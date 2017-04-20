@@ -45,6 +45,4 @@ add_uuid
   ]
 }
 --
-{"hello": "World"}
-
-{}
+# expected output tested in test method
