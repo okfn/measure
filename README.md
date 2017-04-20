@@ -29,9 +29,67 @@ The main change here is having a clean, openly available codebase, and using a m
 
 Potentially, we'd love to see interest from other non-profits who receive funds to execute on projects, and would like a simple yet systematic way to collect data on what they do.
 
+## Project Configuration
+
+Each project has a `measure.source-spec.yaml` configuration file within a project directory in `/projects`, e.g. for the Frictionless Data project:
+
+```
+/projects/
+└── frictionlessdata
+    └── measure.source-spec.yaml
+└── anotherproject
+    └── measure.source-spec.yaml
+```
+
+The YAML file defines the project name, and configuration settings for each data source we want to measure. Data sources are grouped by theme, e.g. `code-hosting`, `social-media`, and `code-packaging`. Under each theme is the specific configuration for each data source. Here is an example of the basic structure for a project configuration file:
+
+```yaml
+# measure.source-spec.yaml
+
+project: frictionlessdata
+
+config:
+  code-hosting: # <------- theme
+    github:  # <---------- data source
+      repositories:  # <-- data source settings
+        - "frictionlessdata/jsontableschema-models-js"
+        - "frictionlessdata/datapackage-pipelines"
+        [...]
+
+  social-media:
+    twitter:
+      entities:
+        - "#frictionlessdata"
+        - "#datapackages"
+        [...]
+```
+
+Below is the specific configuration settings for each type of data source.
+
+### Code hosting
+
+#### Github
+
+The Github processor collects data about each repository listed in the `repositories` section. For each repository, the processor collects:
+
+- the number of **stars**
+- the number of **watchers**
+
+```yaml
+config:
+  code-hosting:
+    github:
+      repositories:
+        - "frictionlessdata/jsontableschema-models-js"
+        - "frictionlessdata/datapackage-pipelines"
+```
+
+
 ## Installation
 
 ### Environmental Variables
+
+Each installation of Measure requires certain environmental variables to be set.
 
 #### General
 
