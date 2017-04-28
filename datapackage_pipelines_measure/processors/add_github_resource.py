@@ -26,6 +26,7 @@ except json.decoder.JSONDecodeError:
 # remap retrieved dict to scheme in parameters
 resource_content = {t_key: repo_content[s_key]
                     for t_key, s_key in parameters['map_fields'].items()}
+resource_content['source'] = 'github'
 
 resource = {
     'name': name,

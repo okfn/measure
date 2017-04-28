@@ -27,7 +27,7 @@ ENV['PYTHONPATH'] = ROOT_PATH
 class TestMeasureProcessors(unittest.TestCase):
 
     @requests_mock.mock()
-    def test_my_processor(self, mock_request):
+    def test_add_github_resource_processor(self, mock_request):
         # mock the github repsonse
         mock_github_response = {
             'name': 'my-repository',
@@ -72,13 +72,18 @@ class TestMeasureProcessors(unittest.TestCase):
         assert dp_resources[0]['name'] == 'hello'
         field_names = \
             [field['name'] for field in dp_resources[0]['schema']['fields']]
-        assert field_names == ['repository', 'watchers', 'stars']
+        assert field_names == ['repository', 'watchers', 'stars', 'source']
 
         # Asserts for the res_iter
         spew_res_iter_contents = list(spew_res_iter)
         assert len(spew_res_iter_contents) == 1
         assert list(spew_res_iter_contents[0]) == \
-            [{'repository': 'my-repository', 'watchers': 4, 'stars': 1}]
+            [{
+                'repository': 'my-repository',
+                'watchers': 4,
+                'stars': 1,
+                'source': 'github'
+            }]
 
 
 class MeasureProcessorsFixturesTest(ProcessorFixtureTestsBase):
