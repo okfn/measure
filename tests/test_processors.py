@@ -5,6 +5,8 @@ import re
 import json
 import datetime
 import unittest
+import mock
+from collections import namedtuple
 
 import requests_mock
 
@@ -24,11 +26,155 @@ ENV = os.environ.copy()
 ENV['PYTHONPATH'] = ROOT_PATH
 
 
-class TestMeasureProcessors(unittest.TestCase):
+class MockTwitterAPI():
+
+    def get_user(self, account_name):
+        User = namedtuple('User', 'followers_count')
+        return User(5)
+
+
+class TestMeasureTwitterProcessor(unittest.TestCase):
+
+    @mock.patch('tweepy.auth.AppAuthHandler')
+    @mock.patch('tweepy.API')
+    def test_add_twitter_resource_processor_user(self, mock_api, mock_auth):
+        '''Test twitter processor handles user account entities (@myuser).'''
+
+        # mock the twitter api response
+        mock_auth.return_value = 'authed'
+        mock_api.return_value = MockTwitterAPI()
+
+        # input arguments used by our mock `ingest`
+        datapackage = {
+            'name': 'my-datapackage',
+            'project': 'my-project',
+            'resources': []
+        }
+        params = {
+            'entity': '@myuser'
+        }
+
+        # Path to the processor we want to test
+        processor_dir = \
+            os.path.dirname(datapackage_pipelines_measure.processors.__file__)
+        processor_path = os.path.join(processor_dir, 'add_twitter_resource.py')
+
+        # Trigger the processor with our mock `ingest` and capture what it will
+        # returned to `spew`.
+        spew_args, _ = \
+            mock_processor_test(processor_path,
+                                (params, datapackage, []))
+
+        spew_dp = spew_args[0]
+        spew_res_iter = spew_args[1]
+
+        # Asserts for the datapackage
+        dp_resources = spew_dp['resources']
+        assert len(dp_resources) == 1
+        assert dp_resources[0]['name'] == 'at-myuser'
+        field_names = \
+            [field['name'] for field in dp_resources[0]['schema']['fields']]
+        assert field_names == ['entity', 'entity_type', 'source', 'followers']
+
+        # Asserts for the res_iter
+        spew_res_iter_contents = list(spew_res_iter)
+        assert len(spew_res_iter_contents) == 1
+        assert list(spew_res_iter_contents[0]) == \
+            [{
+                'entity': '@myuser',
+                'entity_type': 'account',
+                'followers': 5,
+                'source': 'twitter'
+            }]
+
+    @mock.patch('tweepy.auth.AppAuthHandler')
+    @mock.patch('tweepy.API')
+    def test_add_twitter_resource_processor_hashtag(self, mock_api, mock_auth):
+        '''Test twitter processor handles hashtag entities (#myhashtag).'''
+        # mock the twitter api response
+        mock_auth.return_value = 'authed'
+        mock_api.return_value = MockTwitterAPI()
+
+        # input arguments used by our mock `ingest`
+        datapackage = {
+            'name': 'my-datapackage',
+            'project': 'my-project',
+            'resources': []
+        }
+        params = {
+            'entity': '#myhashtag'
+        }
+
+        # Path to the processor we want to test
+        processor_dir = \
+            os.path.dirname(datapackage_pipelines_measure.processors.__file__)
+        processor_path = os.path.join(processor_dir, 'add_twitter_resource.py')
+
+        # Trigger the processor with our mock `ingest` and capture what it will
+        # returned to `spew`.
+        spew_args, _ = \
+            mock_processor_test(processor_path,
+                                (params, datapackage, []))
+
+        spew_dp = spew_args[0]
+        spew_res_iter = spew_args[1]
+
+        # Asserts for the datapackage
+        dp_resources = spew_dp['resources']
+        assert len(dp_resources) == 1
+        assert dp_resources[0]['name'] == 'hash-myhashtag'
+        field_names = \
+            [field['name'] for field in dp_resources[0]['schema']['fields']]
+        assert field_names == ['entity', 'entity_type', 'source', 'followers']
+
+        # Asserts for the res_iter
+        spew_res_iter_contents = list(spew_res_iter)
+        assert len(spew_res_iter_contents) == 1
+        assert list(spew_res_iter_contents[0]) == \
+            [{
+                'entity': '#myhashtag',
+                'entity_type': 'hashtag',
+                'followers': None,
+                'source': 'twitter'
+            }]
+
+    @mock.patch('tweepy.auth.AppAuthHandler')
+    @mock.patch('tweepy.API')
+    def test_add_twitter_resource_processor_nonentity(self, mock_api,
+                                                      mock_auth):
+        '''Test twitter processor handles non-entities properly (neither a user
+        nor hashtag).'''
+        # mock the twitter api response
+        mock_auth.return_value = 'authed'
+        mock_api.return_value = MockTwitterAPI()
+
+        # input arguments used by our mock `ingest`
+        datapackage = {
+            'name': 'my-datapackage',
+            'project': 'my-project',
+            'resources': []
+        }
+        params = {
+            'entity': 'non-entity'
+        }
+
+        # Path to the processor we want to test
+        processor_dir = \
+            os.path.dirname(datapackage_pipelines_measure.processors.__file__)
+        processor_path = os.path.join(processor_dir, 'add_twitter_resource.py')
+
+        # Trigger the processor with our mock `ingest` and capture what it will
+        # returned to `spew`.
+        error_msg = 'Entity, "non-entity", must be an @account or a #hashtag'
+        with self.assertRaises(ValueError, msg=error_msg):
+            mock_processor_test(processor_path, (params, datapackage, []))
+
+
+class TestMeasureGithubProcessor(unittest.TestCase):
 
     @requests_mock.mock()
     def test_add_github_resource_processor(self, mock_request):
-        # mock the github repsonse
+        # mock the github response
         mock_github_response = {
             'name': 'my-repository',
             'subscribers_count': 4,

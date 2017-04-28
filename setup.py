@@ -19,7 +19,8 @@ PACKAGE = 'datapackage_pipelines_measure'
 NAME = PACKAGE.replace('_', '-')
 INSTALL_REQUIRES = [
     'datapackage-pipelines',
-    'psycopg2'
+    'psycopg2',
+    'tweepy'
 ]
 TESTS_REQUIRE = [
     'pylama',

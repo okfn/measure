@@ -27,22 +27,26 @@ def add_steps(steps: list, pipeline_id: str,
         'fields': {
             'entity': [],
             'entity_type': [],
-            'source': []}
+            'source': [],
+            'followers': []}
     }))
 
-    # steps.append(('set_types', {
-    #     'types': {
-    #         'repository': {
-    #             'type': 'string',
-    #         },
-    #         'watchers': {
-    #             'type': 'integer'
-    #         },
-    #         'stars': {
-    #             'type': 'integer'
-    #         }
-    #     }
-    # }))
+    steps.append(('set_types', {
+        'types': {
+            'entity': {
+                'type': 'string',
+            },
+            'entity_type': {
+                'type': 'string'
+            },
+            'source': {
+                'type': 'string'
+            },
+            'followers': {
+                'type': 'integer'
+            }
+        }
+    }))
 
     steps.append(('measure.add_project_name', {'name': project_id}))
     steps.append(('measure.add_timestamp'))
