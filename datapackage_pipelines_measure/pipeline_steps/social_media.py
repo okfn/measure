@@ -1,8 +1,5 @@
 import os
 
-from datapackage_pipelines.generators import slugify
-
-from datapackage_pipelines_measure.config import settings
 
 DOWNLOADS_PATH = os.path.join(os.path.dirname(__file__), '../../downloads')
 
