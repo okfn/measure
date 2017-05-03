@@ -1,5 +1,7 @@
 import os
 
+from datapackage_pipelines_measure.config import settings
+
 
 DOWNLOADS_PATH = os.path.join(os.path.dirname(__file__), '../../downloads')
 
@@ -9,12 +11,9 @@ label = 'social-media'
 def add_steps(steps: list, pipeline_id: str,
               project_id: str, config: dict) -> list:
     for entity in config['twitter']['entities']:
-        # for each entity
-            # create a resource with
-            # - entity: name of entity
-            # - entity_type: account, hashtag, page
         steps.append(('measure.add_twitter_resource', {
-            'entity': entity
+            'entity': entity,
+            'project_id': project_id
         }))
 
     steps.append(('concatenate', {
@@ -25,7 +24,8 @@ def add_steps(steps: list, pipeline_id: str,
             'entity': [],
             'entity_type': [],
             'source': [],
-            'followers': []}
+            'followers': [],
+            'mentions': []}
     }))
 
     steps.append(('set_types', {
@@ -41,6 +41,9 @@ def add_steps(steps: list, pipeline_id: str,
             },
             'followers': {
                 'type': 'integer'
+            },
+            'mentions': {
+                'type': 'integer'
             }
         }
     }))
@@ -54,14 +57,14 @@ def add_steps(steps: list, pipeline_id: str,
         'out-path': '{}/{}'.format(DOWNLOADS_PATH, pipeline_id)
     }))
 
-    # steps.append(('dump.to_sql', {
-    #     'engine': settings.DB_ENGINE,
-    #     'tables': {
-    #         'socialmedia': {
-    #             'resource-name': 'social-media',
-    #             'mode': 'append'
-    #         }
-    #     }
-    # }))
+    steps.append(('dump.to_sql', {
+        'engine': settings.DB_ENGINE,
+        'tables': {
+            'socialmedia': {
+                'resource-name': 'social-media',
+                'mode': 'append'
+            }
+        }
+    }))
 
     return steps
