@@ -18,6 +18,15 @@ ENV = os.environ.copy()
 ENV['PYTHONPATH'] = ROOT_PATH
 
 
+Status = namedtuple('Status',
+                    [
+                        'screen_name',
+                        'favorite_count',
+                        'retweet_count',
+                        'created_at'
+                    ])
+
+
 class MockTwitterAPI():
 
     def get_user(self, account_name):
@@ -25,37 +34,39 @@ class MockTwitterAPI():
         return User(5)
 
     def search(self):
-        Status = namedtuple('Status', 'screen_name')
-        return iter([
-            Status('okfnlabs'),
-            Status('anonymous')
-        ])
-
-
-class MockTwitterCursor():
-
-    def __init__(self):
-        Status = namedtuple('Status', 'screen_name')
-        self._items = [
-            Status('okfnlabs'),
-            Status('anonymous')
+        yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
+        return [
+            Status('okfnlabs', 2, 5, yesterday),
+            Status('anonymous', 3, 6, yesterday)
         ]
 
-    def items(self):
-        class MockCursorIterable():
+    def user_timeline(self):
+        yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
+        return [
+            Status('okfnlabs', 2, 5, yesterday),
+            Status('anonymous', 3, 6, yesterday),
+            Status('my_user', 1, 1, datetime.datetime.now())
+        ]
 
-            def __init__(self, items):
-                self._items = items
-                self.counter = 0
 
-            def next(self):
-                if self.counter >= len(self._items):
-                    raise StopIteration
-                item = self._items[self.counter]
-                self.counter += 1
-                return item
+my_mock_api = MockTwitterAPI()
 
-        return MockCursorIterable(self._items)
+
+def get_cursor_items_iter(items):
+    class MockCursorIterable():
+
+        def __init__(self, items):
+            self._items = items
+            self.counter = 0
+
+        def next(self):
+            if self.counter >= len(self._items):
+                raise StopIteration
+            item = self._items[self.counter]
+            self.counter += 1
+            return item
+
+    return MockCursorIterable(items)
 
 
 class MockDatastore():
@@ -82,18 +93,22 @@ class TestMeasureTwitterProcessor(unittest.TestCase):
         mock_cursor,
         mock_datastore
     ):
-        '''Test twitter processor handles user account (@myuser) mentions when
-        latest stored result was run today.
+        '''Test twitter processor handles user account (@myuser) mentions and
+        interactions when latest stored result was run today.
 
         Use the stored result.
         '''
 
         # mock the twitter api response
         mock_auth.return_value = 'authed'
-        mock_api.return_value = MockTwitterAPI()
-        mock_cursor.return_value = MockTwitterCursor()
+        mock_api.return_value = my_mock_api
+        mock_cursor.return_value.items.side_effect = [
+            get_cursor_items_iter(my_mock_api.search()),
+            get_cursor_items_iter(my_mock_api.user_timeline())
+        ]
         stored_latest = {
             'mentions': 5,
+            'interactions': 20,
             'timestamp': datetime.datetime.now()
         }
         mock_datastore.return_value = MockDatastore(stored_latest)
@@ -124,7 +139,9 @@ class TestMeasureTwitterProcessor(unittest.TestCase):
 
         # Asserts for the res_iter
         spew_res_iter_contents = list(spew_res_iter)
-        assert list(spew_res_iter_contents[0])[0]['mentions'] == 5
+        resource = list(spew_res_iter_contents[0])[0]
+        assert resource['mentions'] == 5
+        assert resource['interactions'] == 20
 
     @mock.patch('datapackage_pipelines_measure.datastore.get_datastore')
     @mock.patch('tweepy.Cursor')
@@ -138,18 +155,23 @@ class TestMeasureTwitterProcessor(unittest.TestCase):
         mock_datastore
     ):
         '''Test twitter processor handles user account entities (@myuser)
-        mentions when latest stored result was run before today.
+        mentions and interactions when latest stored result was run before
+        today.
 
         Add today's result to the latest stored result.
         '''
 
         # mock the twitter api response
         mock_auth.return_value = 'authed'
-        mock_api.return_value = MockTwitterAPI()
-        mock_cursor.return_value = MockTwitterCursor()
+        mock_api.return_value = my_mock_api
+        mock_cursor.return_value.items.side_effect = [
+            get_cursor_items_iter(my_mock_api.search()),
+            get_cursor_items_iter(my_mock_api.user_timeline())
+        ]
         stored_latest = {
             'mentions': 5,
-            'timestamp': datetime.datetime.now() - datetime.timedelta(days=2)
+            'interactions': 20,
+            'timestamp': datetime.datetime.now() - datetime.timedelta(days=3)
         }
         mock_datastore.return_value = MockDatastore(stored_latest)
 
@@ -179,7 +201,9 @@ class TestMeasureTwitterProcessor(unittest.TestCase):
 
         # Asserts for the res_iter
         spew_res_iter_contents = list(spew_res_iter)
-        assert list(spew_res_iter_contents[0])[0]['mentions'] == 7
+        resource = list(spew_res_iter_contents[0])[0]
+        assert resource['mentions'] == 7
+        assert resource['interactions'] == 36
 
     @mock.patch('datapackage_pipelines_measure.datastore.get_datastore')
     @mock.patch('tweepy.Cursor')
@@ -193,8 +217,11 @@ class TestMeasureTwitterProcessor(unittest.TestCase):
 
         # mock the twitter api response
         mock_auth.return_value = 'authed'
-        mock_api.return_value = MockTwitterAPI()
-        mock_cursor.return_value = MockTwitterCursor()
+        mock_api.return_value = my_mock_api
+        mock_cursor.return_value.items.side_effect = [
+            get_cursor_items_iter(my_mock_api.search()),
+            get_cursor_items_iter(my_mock_api.user_timeline())
+        ]
         mock_datastore.return_value = MockDatastore(None)
 
         # input arguments used by our mock `ingest`
@@ -229,7 +256,8 @@ class TestMeasureTwitterProcessor(unittest.TestCase):
         field_names = \
             [field['name'] for field in dp_resources[0]['schema']['fields']]
         assert field_names == ['entity', 'entity_type',
-                               'source', 'followers', 'mentions']
+                               'source', 'followers',
+                               'mentions', 'interactions']
 
         # Asserts for the res_iter
         spew_res_iter_contents = list(spew_res_iter)
@@ -240,7 +268,8 @@ class TestMeasureTwitterProcessor(unittest.TestCase):
                 'entity_type': 'account',
                 'followers': 5,
                 'source': 'twitter',
-                'mentions': 2
+                'mentions': 2,
+                'interactions': 16
             }]
 
     @mock.patch('datapackage_pipelines_measure.datastore.get_datastore')
@@ -253,8 +282,11 @@ class TestMeasureTwitterProcessor(unittest.TestCase):
         '''Test twitter processor handles hashtag entities (#myhashtag).'''
         # mock the twitter api response
         mock_auth.return_value = 'authed'
-        mock_api.return_value = MockTwitterAPI()
-        mock_cursor.return_value = MockTwitterCursor()
+        mock_api.return_value = my_mock_api
+        mock_cursor.return_value.items.side_effect = [
+            get_cursor_items_iter(my_mock_api.search()),
+            get_cursor_items_iter(my_mock_api.user_timeline())
+        ]
         mock_datastore.return_value = MockDatastore(None)
 
         # input arguments used by our mock `ingest`
@@ -289,7 +321,8 @@ class TestMeasureTwitterProcessor(unittest.TestCase):
         field_names = \
             [field['name'] for field in dp_resources[0]['schema']['fields']]
         assert field_names == ['entity', 'entity_type',
-                               'source', 'followers', 'mentions']
+                               'source', 'followers',
+                               'mentions', 'interactions']
 
         # Asserts for the res_iter
         spew_res_iter_contents = list(spew_res_iter)
@@ -300,7 +333,8 @@ class TestMeasureTwitterProcessor(unittest.TestCase):
                 'entity_type': 'hashtag',
                 'followers': None,
                 'source': 'twitter',
-                'mentions': 2
+                'mentions': 2,
+                'interactions': 16
             }]
 
     @mock.patch('tweepy.auth.AppAuthHandler')
@@ -309,9 +343,6 @@ class TestMeasureTwitterProcessor(unittest.TestCase):
                                                       mock_auth):
         '''Test twitter processor handles non-entities properly (neither a user
         nor hashtag).'''
-        # mock the twitter api response
-        mock_auth.return_value = 'authed'
-        mock_api.return_value = MockTwitterAPI()
 
         # input arguments used by our mock `ingest`
         datapackage = {

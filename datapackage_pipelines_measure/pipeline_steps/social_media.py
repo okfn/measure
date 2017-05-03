@@ -25,7 +25,8 @@ def add_steps(steps: list, pipeline_id: str,
             'entity_type': [],
             'source': [],
             'followers': [],
-            'mentions': []}
+            'mentions': [],
+            'interactions': []}
     }))
 
     steps.append(('set_types', {
@@ -43,6 +44,9 @@ def add_steps(steps: list, pipeline_id: str,
                 'type': 'integer'
             },
             'mentions': {
+                'type': 'integer'
+            },
+            'interactions': {
                 'type': 'integer'
             }
         }

@@ -20,7 +20,7 @@ ENTITY_VALUE_ERROR_MSG = 'Entity, "{}", must be an @account or a #hashtag'
 TWITTER_API_USER_NOT_FOUND_ERROR_CODE = "50"
 TWITTER_API_DATE_RANGE_FORMAT = '%Y-%m-%d'
 TWITTER_API_PER_PAGE_LIMIT = 100
-TWITTER_API_SEARCH_INDEX_LIMIT_IN_DAYS = 1
+TWITTER_API_SEARCH_INDEX_LIMIT_IN_DAYS = 3
 TWITTER_API_RATE_LIMIT_PERIOD = 900  # 15 mins
 DATASTORE_TABLE = 'socialmedia'
 
@@ -90,8 +90,8 @@ def _get_twitter_search_results(entity, formatted_start_date,
     tweets that matched the search within given time frame, including retweets.
 
     :param entity: the searched term.
-    :param formatted_start_date: the starting date of period. inclusive.
-    :param formatted_end_date: the end date of period. exclusive.
+    :param formatted_start_date: the starting date of period (inclusive).
+    :param formatted_end_date: the end date of period (exclusive).
     :return a list of tweets'''
 
     query_args = {
@@ -107,6 +107,78 @@ def _get_twitter_search_results(entity, formatted_start_date,
                                             .items()):
         all_tweets_in_search.append(tweet)
     return all_tweets_in_search
+
+
+def _get_account_tweets(entity, start_date, end_date):
+    '''This method iterates over the tweets written by the given user, and
+    returns a list of tweets in given time period.
+
+    Since there's no built-in option for time filtering, it is done by
+    iterating from latest to oldest, excluding too-new, and stopping once too-
+    old tweets are reached.
+
+    :param entity: the user who's timeline is iterated over.
+    :param start_date: the earliest date of the period (inclusive).
+    :param end_date: the end date of the period (exclusive).
+    '''
+    all_self_tweets_in_time_period = []
+    user_tweets_args = {'screen_name': entity, 'count': 200,
+                        'include_rts': False, 'exclude_replies': False}
+    start_date = datetime. \
+        datetime.strptime(start_date, TWITTER_API_DATE_RANGE_FORMAT).date()
+    end_date = datetime. \
+        datetime.strptime(end_date, TWITTER_API_DATE_RANGE_FORMAT).date()
+    api = _get_twitter_api_handler()
+
+    for tweet in _handle_twitter_rate_limit(tweepy_cursor(
+            api.user_timeline, **user_tweets_args).items()):
+        if tweet.created_at.date() >= end_date:
+            continue
+        if tweet.created_at.date() < start_date:
+            break
+        all_self_tweets_in_time_period.append(tweet)
+    return all_self_tweets_in_time_period
+
+
+def _get_mentions_for_entity_from_source(entity, start_date, end_date):
+    '''Get the mentions metric for entity type.'''
+    all_tweets_in_search = _get_twitter_search_results(entity,
+                                                       start_date,
+                                                       end_date)
+    return len(all_tweets_in_search)
+
+
+def _get_interactions_for_entity_from_source(entity, start_date, end_date):
+    def _count_indicators_of_interaction(list_of_tweets):
+        '''This methods iterates over a list of tweets, and returns a two-tuple
+        of total count of favorites, and total count of retweets. The method
+        makes sure it doesn't double-count stats, so it skips tweets that are
+        themselves retweets, and counts only original tweets'''
+        favorite_count, retweet_count = 0, 0
+        for tweet in list_of_tweets:
+            if getattr(tweet, 'retweeted_status', None):
+                continue
+            favorite_count += tweet.favorite_count
+            retweet_count += tweet.retweet_count
+        return favorite_count, retweet_count
+
+    entity_type = _get_entity_type(entity)
+    if entity_type == 'account':
+        '''
+        Get interaction for a twitter account entity. This is done by getting
+        all the account tweets during given date range, and aggregate the
+        measured 'interaction' metrics - favorites and retweets.
+        '''
+        tweets = _get_account_tweets(entity, start_date, end_date)
+    elif entity_type == 'hashtag':
+        '''
+        Get interactions for a hashtag entity. This is done by searching for
+        the hashtag between the given date range, and aggregate the measured
+        'interaction' metrics - favorites and retweets.
+        '''
+        tweets = _get_twitter_search_results(entity, start_date, end_date)
+    favorite_count, retweet_count = _count_indicators_of_interaction(tweets)
+    return sum([favorite_count, retweet_count])
 
 
 parameters, datapackage, res_iter = ingest()
@@ -145,45 +217,61 @@ filter_object = {
 datastore = get_datastore()
 entity_last_run = datastore.get_latest_from_table(filter_object,
                                                   DATASTORE_TABLE)
-mentions_len = 0
+mentions = 0
+interactions = 0
 if entity_last_run:
+    latest_mentions = entity_last_run.get('mentions', 0)
+    latest_interactions = entity_last_run.get('interactions', 0)
     if entity_last_run['timestamp'].date() == datetime.date.today():
-        # last run was today
-        log.debug('last run for this entity was today')
+        # Last run today
+        log.debug('Last run for entity, "{}". was today.'.format(entity))
         # Don't collect from twitter again, just reuse entity_last_run's data
-        mentions_len = entity_last_run['mentions']
+        mentions = latest_mentions
+        interactions = latest_interactions
     elif entity_last_run['timestamp'].date() < datetime.date.today():
-        # last run was before today, so get tweets from the last run date to
-        # yesterday (inclusive)
-        log.debug('last run before today')
-        end_date = datetime.date.today() - datetime.timedelta(days=1)
+        # Last run before today, get tweets from the last run date to
+        # yesterday.
+        log.debug('Last run for entity, "{}", was before today.'
+                  .format(entity))
+        end_date = datetime.date.today()  # end_date is exclusive (so yesteray)
         start_date = entity_last_run['timestamp'].date()
-        results = _get_twitter_search_results(
+        mentions = _get_mentions_for_entity_from_source(
             entity,
             start_date.strftime(TWITTER_API_DATE_RANGE_FORMAT),
             end_date.strftime(TWITTER_API_DATE_RANGE_FORMAT)
         )
-        mentions_len = len(results) + entity_last_run['mentions']
+        mentions = mentions + latest_mentions
+        interactions = _get_interactions_for_entity_from_source(
+            entity,
+            start_date.strftime(TWITTER_API_DATE_RANGE_FORMAT),
+            end_date.strftime(TWITTER_API_DATE_RANGE_FORMAT)
+        )
+        interactions = interactions + latest_interactions
 else:
     # No last run for this entity.
     log.debug('No last run for entity "{}"'.format(entity))
     # Collect twitter data for entity for the last few days
-    end_date = datetime.date.today()
+    end_date = datetime.date.today()  # end_date is exclusive (so yesterday)
     start_date = (end_date - datetime.timedelta(
         days=TWITTER_API_SEARCH_INDEX_LIMIT_IN_DAYS))
-    results = _get_twitter_search_results(
+    mentions = _get_mentions_for_entity_from_source(
         entity,
         start_date.strftime(TWITTER_API_DATE_RANGE_FORMAT),
         end_date.strftime(TWITTER_API_DATE_RANGE_FORMAT)
     )
-    mentions_len = len(results)
+    interactions = _get_interactions_for_entity_from_source(
+        entity,
+        start_date.strftime(TWITTER_API_DATE_RANGE_FORMAT),
+        end_date.strftime(TWITTER_API_DATE_RANGE_FORMAT)
+    )
 
 resource_content = {
     'entity': entity,
     'entity_type': entity_type,
     'source': 'twitter',
     'followers': followers_count,
-    'mentions': mentions_len
+    'mentions': mentions,
+    'interactions': interactions
 }
 
 resource['schema'] = {
