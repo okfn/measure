@@ -13,10 +13,6 @@ import datapackage_pipelines_measure.processors
 import logging
 log = logging.getLogger(__name__)
 
-ROOT_PATH = os.path.join(os.path.dirname(__file__), '..')
-ENV = os.environ.copy()
-ENV['PYTHONPATH'] = ROOT_PATH
-
 
 Status = namedtuple('Status',
                     [
