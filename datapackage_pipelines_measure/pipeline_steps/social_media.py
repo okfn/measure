@@ -16,6 +16,11 @@ def add_steps(steps: list, pipeline_id: str,
             'project_id': project_id
         }))
 
+    for page in config['facebook']['pages']:
+        steps.append(('measure.add_facebook_resource', {
+            'entity': page
+        }))
+
     steps.append(('concatenate', {
         'target': {
             'name': 'social-media',
