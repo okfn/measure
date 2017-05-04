@@ -85,6 +85,27 @@ config:
 ```
 
 
+#### Twitter
+
+The Twitter processor collects data about each entity listed in the `entities` section. Entities can be either a twitter hashtag (starting with `#`) or an account name (starting with a `@`). For each entity, the processor collects:
+
+- **mentions**: an accumulated total of tweets mentioning the entity
+- **interactions**: an accumulated total of 'favorites' and 'retweets' for tweets mentioning the hashtag, or tweets authored by the account.
+
+And additionally, for account entities:
+- the current number of **followers**
+
+```yaml
+config:
+  social-media:
+    twitter:
+      entities:
+        - "#frictionlessdata"
+        - "#datapackages"
+        - "@okfnlabs"
+```
+
+
 ## Installation
 
 ### Environmental Variables
@@ -98,5 +119,10 @@ Each installation of Measure requires certain environmental variables to be set.
 
 #### Github
 
-- `MEASURE_GITHUB_API_BASE_URL`: Github api base url (`https://api.github.com/repos/`)
-- `MEASURE_GITHUB_API_TOKEN`: Github api token used for making requests
+- `MEASURE_GITHUB_API_BASE_URL`: Github API base url (`https://api.github.com/repos/`)
+- `MEASURE_GITHUB_API_TOKEN`: Github API token used for making requests
+
+#### Twitter
+
+- `MEASURE_TWITTER_API_CONSUMER_KEY`: Twitter app API consumer key
+- `MEASURE_TWITTER_API_CONSUMER_SECRET`: Twitter app API consumer secret
