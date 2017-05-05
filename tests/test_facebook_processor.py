@@ -91,3 +91,29 @@ class TestMeasureFacebookProcessor(unittest.TestCase):
                 'source': 'facebook',
                 'followers': 16689
             }]
+
+    def test_add_facebook_resource_processor_nopagetoken(self):
+        '''Test facebook processor handles when no page token is available.'''
+
+        # input arguments used by our mock `ingest`
+        datapackage = {
+            'name': 'my-datapackage',
+            'project': 'my-project',
+            'resources': []
+        }
+        params = {
+            'entity': 'NoPage'
+        }
+
+        # Path to the processor we want to test
+        processor_dir = \
+            os.path.dirname(datapackage_pipelines_measure.processors.__file__)
+        processor_path = os.path.join(processor_dir,
+                                      'add_facebook_resource.py')
+
+        # Trigger the processor with our mock `ingest` and capture what it will
+        # returned to `spew`.
+        error_msg = 'No Facebook Page Access Token found for page:'
+        ' "NoPage" in settings'
+        with self.assertRaises(RuntimeError, msg=error_msg):
+            mock_processor_test(processor_path, (params, datapackage, []))
