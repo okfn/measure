@@ -36,21 +36,20 @@ model_to_metric = [
 graph = facebook_sdk.GraphAPI()
 
 
-def _get_page_access_token_from_config(page):
-    '''Get the access token for the given page from the config'''
-    token_name = 'FACEBOOK_API_ACCESS_TOKEN_' + page.upper()
-    try:
-        return getattr(settings, token_name)
-    except AttributeError:
-        raise RuntimeError('No Facebook Page Access Token found for '
-                           'page: "{}" in settings'.format(page))
-
-
 def _request_data_from_facebook_api(page, metrics, period, since, until):
     '''Execute a request from facebook api, and return the response. parameters
     are documented here:
     developers.facebook.com/docs/graph-api/reference/page/insights/
     '''
+    def _get_page_access_token_from_config(page):
+        '''Get the access token for the given page from the config'''
+        token_name = 'FACEBOOK_API_ACCESS_TOKEN_' + page.upper()
+        try:
+            return getattr(settings, token_name)
+        except AttributeError:
+            raise RuntimeError('No Facebook Page Access Token found for '
+                               'page: "{}" in settings'.format(page))
+
     graph.access_token = _get_page_access_token_from_config(page)
     path = '{version}/{page}/insights/'.format(version=FACEBOOK_API_VERSION,
                                                page=page)
@@ -77,7 +76,6 @@ def _get_lifetime_metrics_from_source(page):
 
     Get lifetime metrics as they were yesterday (the last whole day).
     '''
-
     def _get_metric_value_by_date(metric_values, requested_date):
         '''From a list of values for a given metric, return the value of the
         requested date. If date does not exist in list, raise error.
@@ -96,7 +94,7 @@ def _get_lifetime_metrics_from_source(page):
             collected_metric['values'], requested_date)
 
     def _flatten_lifetime_metrics_facebook_response(requested_date,
-                                                      response):
+                                                    response):
         '''Take a facebook response with cumulative data, and return it as a
         dictionary with metric_name:metric_value items.
         '''
