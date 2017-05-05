@@ -8,7 +8,7 @@ from datapackage_pipelines.generators import slugify
 from datapackage_pipelines.wrapper import ingest, spew
 
 from datapackage_pipelines_measure.config import settings
-from datapackage_pipelines_measure.datastore import get_datastore
+# from datapackage_pipelines_measure.datastore import get_datastore
 
 import logging
 log = logging.getLogger(__name__)
@@ -70,7 +70,7 @@ def _request_data_from_facebook_api(page, metrics, period, since, until):
     return response
 
 
-def _get_cumulative_metrics_from_source(page):
+def _get_lifetime_metrics_from_source(page):
     '''Get metrics that are available on Facebook Insights API as so-called
     "Lifetime" period, i.e cumulative, and return them with no further
     calculations.
@@ -95,7 +95,7 @@ def _get_cumulative_metrics_from_source(page):
         return collected_metric['name'], _get_metric_value_by_date(
             collected_metric['values'], requested_date)
 
-    def _flatten_cumulative_metrics_facebook_response(requested_date,
+    def _flatten_lifetime_metrics_facebook_response(requested_date,
                                                       response):
         '''Take a facebook response with cumulative data, and return it as a
         dictionary with metric_name:metric_value items.
@@ -119,7 +119,7 @@ def _get_cumulative_metrics_from_source(page):
         until=end_date.strftime(FACEBOOK_API_DATE_RANGE_FORMAT)
     )
 
-    return _flatten_cumulative_metrics_facebook_response(start_date, response)
+    return _flatten_lifetime_metrics_facebook_response(start_date, response)
 
 
 parameters, datapackage, res_iter = ingest()
@@ -139,9 +139,9 @@ resource_content = {
 }
 
 followers_count = None
-cumulative_metrics = _get_cumulative_metrics_from_source(entity)
+lifetime_metrics = _get_lifetime_metrics_from_source(entity)
 resource_content.update({
-    'followers': cumulative_metrics['page_fans']
+    'followers': lifetime_metrics['page_fans']
 })
 
 resource['schema'] = {
