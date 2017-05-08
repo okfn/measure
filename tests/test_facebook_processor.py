@@ -155,8 +155,7 @@ class TestMeasureFacebookProcessor(unittest.TestCase):
         # Trigger the processor with our mock `ingest` and capture what it will
         # returned to `spew`.
         spew_args, _ = \
-            mock_processor_test(processor_path,
-                                (params, datapackage, []))
+            mock_processor_test(processor_path, (params, datapackage, []))
 
         spew_res_iter = spew_args[1]
 
@@ -214,8 +213,7 @@ class TestMeasureFacebookProcessor(unittest.TestCase):
         # Trigger the processor with our mock `ingest` and capture what it will
         # returned to `spew`.
         spew_args, _ = \
-            mock_processor_test(processor_path,
-                                (params, datapackage, []))
+            mock_processor_test(processor_path, (params, datapackage, []))
 
         spew_res_iter = spew_args[1]
 
@@ -227,8 +225,10 @@ class TestMeasureFacebookProcessor(unittest.TestCase):
         assert resource['interactions'] == 25
         assert resource['impressions'] == 122
 
+    @mock.patch('datapackage_pipelines_measure.datastore.get_datastore')
     @mock.patch('facebook.GraphAPI')
-    def test_add_facebook_resource_processor_page(self, mock_api):
+    def test_add_facebook_resource_processor_page(self, mock_api,
+                                                  mock_datastore):
         '''Test facebook processor handles page entities (MyPage). No stored
         result.'''
 
@@ -239,6 +239,7 @@ class TestMeasureFacebookProcessor(unittest.TestCase):
         before_yesterday = datetime.date.today() - datetime.timedelta(days=2)
         mock_start_date = before_yesterday.strftime('%Y-%m-%d')
         settings.FACEBOOK_API_DEFAULT_START_DATE = mock_start_date
+        mock_datastore.return_value = MockDatastore(None)
 
         # input arguments used by our mock `ingest`
         datapackage = {
@@ -260,8 +261,7 @@ class TestMeasureFacebookProcessor(unittest.TestCase):
         # Trigger the processor with our mock `ingest` and capture what it will
         # returned to `spew`.
         spew_args, _ = \
-            mock_processor_test(processor_path,
-                                (params, datapackage, []))
+            mock_processor_test(processor_path, (params, datapackage, []))
 
         spew_dp = spew_args[0]
         spew_res_iter = spew_args[1]
