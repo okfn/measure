@@ -85,6 +85,8 @@ config:
 ```
 
 
+### Social Media
+
 #### Twitter
 
 The Twitter processor collects data about each entity listed in the `entities` section. Entities can be either a twitter hashtag (starting with `#`) or an account name (starting with a `@`). For each entity, the processor collects:
