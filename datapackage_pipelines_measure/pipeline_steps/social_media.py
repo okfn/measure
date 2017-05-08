@@ -18,7 +18,8 @@ def add_steps(steps: list, pipeline_id: str,
 
     for page in config['facebook']['pages']:
         steps.append(('measure.add_facebook_resource', {
-            'entity': page
+            'entity': page,
+            'project_id': project_id
         }))
 
     steps.append(('concatenate', {
@@ -31,7 +32,8 @@ def add_steps(steps: list, pipeline_id: str,
             'source': [],
             'followers': [],
             'mentions': [],
-            'interactions': []}
+            'interactions': [],
+            'impressions': []}
     }))
 
     steps.append(('set_types', {
@@ -52,6 +54,9 @@ def add_steps(steps: list, pipeline_id: str,
                 'type': 'integer'
             },
             'interactions': {
+                'type': 'integer'
+            },
+            'impressions': {
                 'type': 'integer'
             }
         }

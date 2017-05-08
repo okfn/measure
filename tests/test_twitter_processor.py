@@ -105,6 +105,7 @@ class TestMeasureTwitterProcessor(unittest.TestCase):
         stored_latest = {
             'mentions': 5,
             'interactions': 20,
+            'followers': 4,
             'timestamp': datetime.datetime.now()
         }
         mock_datastore.return_value = MockDatastore(stored_latest)
@@ -136,6 +137,9 @@ class TestMeasureTwitterProcessor(unittest.TestCase):
         # Asserts for the res_iter
         spew_res_iter_contents = list(spew_res_iter)
         resource = list(spew_res_iter_contents[0])[0]
+        # followers is updated from api
+        assert resource['followers'] == 5
+        # the others are updated from today's stored result
         assert resource['mentions'] == 5
         assert resource['interactions'] == 20
 
