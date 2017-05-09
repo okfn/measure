@@ -42,9 +42,11 @@ class MockTwitterAPI():
 
     def user_timeline(self):
         yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
+        before_yesterday = yesterday - datetime.timedelta(days=1)
         return [
             Status('okfnlabs', 2, 5, yesterday),
-            Status('anonymous', 3, 6, yesterday),
+            Status('okfnlabs', 1, 7, yesterday),
+            Status('anonymous', 3, 6, before_yesterday),
             Status('my_user', 1, 1, datetime.datetime.now())
         ]
 
@@ -82,36 +84,28 @@ class MockDatastore():
 
 class TestMeasureTwitterProcessor(unittest.TestCase):
 
-    @mock.patch('datapackage_pipelines_measure.datastore.get_datastore')
     @mock.patch('tweepy.Cursor')
     @mock.patch('tweepy.auth.AppAuthHandler')
     @mock.patch('tweepy.API')
-    def test_add_twitter_resource_processor_mentions_today(
+    def test_add_twitter_resource_processor_account(
         self,
         mock_api,
         mock_auth,
         mock_cursor,
-        mock_datastore
     ):
-        '''Test twitter processor handles user account (@myuser) mentions and
-        interactions when latest stored result was run today.
-
-        Use the stored result.
-        '''
+        '''Test twitter processor handles user account (@myuser) properties.'''
 
         # mock the twitter api response
         mock_auth.return_value = 'authed'
         mock_api.return_value = my_mock_api
         mock_cursor.return_value.items.side_effect = [
             get_cursor_items_iter(my_mock_api.search()),
-            get_cursor_items_iter(my_mock_api.user_timeline())
+            get_cursor_items_iter(my_mock_api.user_timeline()),
+            get_cursor_items_iter(my_mock_api.search()),
+            get_cursor_items_iter(my_mock_api.user_timeline()),
+            get_cursor_items_iter(my_mock_api.search()),
+            get_cursor_items_iter(my_mock_api.user_timeline()),
         ]
-        stored_latest = {
-            'mentions': 5,
-            'interactions': 20,
-            'timestamp': datetime.datetime.now()
-        }
-        mock_datastore.return_value = MockDatastore(stored_latest)
 
         # input arguments used by our mock `ingest`
         datapackage = {
@@ -132,162 +126,73 @@ class TestMeasureTwitterProcessor(unittest.TestCase):
         # Trigger the processor with our mock `ingest` and capture what it will
         # returned to `spew`.
         spew_args, _ = \
-            mock_processor_test(processor_path,
-                                (params, datapackage, []))
+            mock_processor_test(processor_path, (params, datapackage, []))
 
         spew_res_iter = spew_args[1]
 
         # Asserts for the res_iter
         spew_res_iter_contents = list(spew_res_iter)
-        resource = list(spew_res_iter_contents[0])[0]
-        assert resource['mentions'] == 5
-        assert resource['interactions'] == 20
 
-    @mock.patch('datapackage_pipelines_measure.datastore.get_datastore')
-    @mock.patch('tweepy.Cursor')
-    @mock.patch('tweepy.auth.AppAuthHandler')
-    @mock.patch('tweepy.API')
-    def test_add_twitter_resource_processor_mentions_before_today(
-        self,
-        mock_api,
-        mock_auth,
-        mock_cursor,
-        mock_datastore
-    ):
-        '''Test twitter processor handles user account entities (@myuser)
-        mentions and interactions when latest stored result was run before
-        today.
+        # Three rows in first resource
+        assert len(spew_res_iter_contents[0]) == 3
 
-        Add today's result to the latest stored result.
-        '''
+        # Get first row from resource (today)
+        first_row = list(spew_res_iter_contents[0])[0]
+        # followers is updated from api
+        assert first_row['date'] == datetime.date.today()
+        assert first_row['followers'] == 5
+        # the others are updated from today's stored result
+        assert first_row['mentions'] == 2
+        assert first_row['interactions'] == 0
 
-        # mock the twitter api response
-        mock_auth.return_value = 'authed'
-        mock_api.return_value = my_mock_api
-        mock_cursor.return_value.items.side_effect = [
-            get_cursor_items_iter(my_mock_api.search()),
-            get_cursor_items_iter(my_mock_api.user_timeline())
-        ]
-        stored_latest = {
-            'mentions': 5,
-            'interactions': 20,
-            'timestamp': datetime.datetime.now() - datetime.timedelta(days=3)
-        }
-        mock_datastore.return_value = MockDatastore(stored_latest)
+        # Get second row from resource (yesterday)
+        second_row = list(spew_res_iter_contents[0])[1]
+        # followers is updated from api
+        assert second_row['date'] == \
+            datetime.date.today() - datetime.timedelta(days=1)
+        # the others are updated from today's stored result
+        assert second_row['mentions'] == 2
+        assert second_row['interactions'] == 15
 
-        # input arguments used by our mock `ingest`
-        datapackage = {
-            'name': 'my-datapackage',
-            'project': 'my-project',
-            'resources': []
-        }
-        params = {
-            'entity': '@myuser',
-            'project_id': 'my-project'
-        }
+        # Get third row from resource (day before yesterday)
+        third_row = list(spew_res_iter_contents[0])[2]
+        # followers is updated from api
+        assert third_row['date'] == \
+            datetime.date.today() - datetime.timedelta(days=2)
+        # the others are updated from today's stored result
+        assert third_row['mentions'] == 2
+        assert third_row['interactions'] == 9
 
-        # Path to the processor we want to test
-        processor_dir = \
-            os.path.dirname(datapackage_pipelines_measure.processors.__file__)
-        processor_path = os.path.join(processor_dir, 'add_twitter_resource.py')
-
-        # Trigger the processor with our mock `ingest` and capture what it will
-        # returned to `spew`.
-        spew_args, _ = \
-            mock_processor_test(processor_path,
-                                (params, datapackage, []))
-
-        spew_res_iter = spew_args[1]
-
-        # Asserts for the res_iter
-        spew_res_iter_contents = list(spew_res_iter)
-        resource = list(spew_res_iter_contents[0])[0]
-        assert resource['mentions'] == 7
-        assert resource['interactions'] == 36
-
-    @mock.patch('datapackage_pipelines_measure.datastore.get_datastore')
-    @mock.patch('tweepy.Cursor')
-    @mock.patch('tweepy.auth.AppAuthHandler')
-    @mock.patch('tweepy.API')
-    def test_add_twitter_resource_processor_user(self, mock_api,
-                                                 mock_auth, mock_cursor,
-                                                 mock_datastore):
-        '''Test twitter processor handles user account entities (@myuser).
-        No stored result.'''
-
-        # mock the twitter api response
-        mock_auth.return_value = 'authed'
-        mock_api.return_value = my_mock_api
-        mock_cursor.return_value.items.side_effect = [
-            get_cursor_items_iter(my_mock_api.search()),
-            get_cursor_items_iter(my_mock_api.user_timeline())
-        ]
-        mock_datastore.return_value = MockDatastore(None)
-
-        # input arguments used by our mock `ingest`
-        datapackage = {
-            'name': 'my-datapackage',
-            'project': 'my-project',
-            'resources': []
-        }
-        params = {
-            'entity': '@myuser',
-            'project_id': 'my-project'
-        }
-
-        # Path to the processor we want to test
-        processor_dir = \
-            os.path.dirname(datapackage_pipelines_measure.processors.__file__)
-        processor_path = os.path.join(processor_dir, 'add_twitter_resource.py')
-
-        # Trigger the processor with our mock `ingest` and capture what it will
-        # returned to `spew`.
-        spew_args, _ = \
-            mock_processor_test(processor_path,
-                                (params, datapackage, []))
-
-        spew_dp = spew_args[0]
-        spew_res_iter = spew_args[1]
-
-        # Asserts for the datapackage
-        dp_resources = spew_dp['resources']
-        assert len(dp_resources) == 1
-        assert dp_resources[0]['name'] == 'at-myuser'
-        field_names = \
-            [field['name'] for field in dp_resources[0]['schema']['fields']]
-        assert field_names == ['entity', 'entity_type',
-                               'source', 'followers',
-                               'mentions', 'interactions']
-
-        # Asserts for the res_iter
-        spew_res_iter_contents = list(spew_res_iter)
-        assert len(spew_res_iter_contents) == 1
-        assert list(spew_res_iter_contents[0]) == \
-            [{
-                'entity': '@myuser',
-                'entity_type': 'account',
-                'followers': 5,
-                'source': 'twitter',
-                'mentions': 2,
-                'interactions': 16
-            }]
-
-    @mock.patch('datapackage_pipelines_measure.datastore.get_datastore')
     @mock.patch('tweepy.Cursor')
     @mock.patch('tweepy.auth.AppAuthHandler')
     @mock.patch('tweepy.API')
     def test_add_twitter_resource_processor_hashtag(self, mock_api,
-                                                    mock_auth, mock_cursor,
-                                                    mock_datastore):
+                                                    mock_auth, mock_cursor):
         '''Test twitter processor handles hashtag entities (#myhashtag).'''
         # mock the twitter api response
         mock_auth.return_value = 'authed'
         mock_api.return_value = my_mock_api
-        mock_cursor.return_value.items.side_effect = [
-            get_cursor_items_iter(my_mock_api.search()),
-            get_cursor_items_iter(my_mock_api.user_timeline())
+        today = datetime.date.today()
+        todays_statuses = [
+            Status('okfnlabs', 2, 5, today),
+            Status('anonymous', 3, 6, today)
         ]
-        mock_datastore.return_value = MockDatastore(None)
+        yesterday = \
+            datetime.datetime.now() - datetime.timedelta(days=1)
+        yesterdays_statuses = [
+            Status('okfnlabs', 1, 5, yesterday),
+            Status('anonymous', 3, 0, yesterday),
+            Status('anonymous', 3, 8, yesterday)
+        ]
+        day_before_yesterday = yesterday - datetime.timedelta(days=1)
+        before_yesterdays_statuses = [
+            Status('okfnlabs', 2, 5, day_before_yesterday)
+        ]
+        mock_cursor.return_value.items.side_effect = [
+            get_cursor_items_iter(todays_statuses),
+            get_cursor_items_iter(yesterdays_statuses),
+            get_cursor_items_iter(before_yesterdays_statuses)
+        ]
 
         # input arguments used by our mock `ingest`
         datapackage = {
@@ -321,21 +226,44 @@ class TestMeasureTwitterProcessor(unittest.TestCase):
         field_names = \
             [field['name'] for field in dp_resources[0]['schema']['fields']]
         assert field_names == ['entity', 'entity_type',
-                               'source', 'followers',
-                               'mentions', 'interactions']
+                               'source', 'date', 'mentions',
+                               'interactions', 'followers']
 
         # Asserts for the res_iter
         spew_res_iter_contents = list(spew_res_iter)
-        assert len(spew_res_iter_contents) == 1
-        assert list(spew_res_iter_contents[0]) == \
-            [{
+        assert len(spew_res_iter_contents[0]) == 3
+
+        first_row = spew_res_iter_contents[0][0]
+        assert first_row == \
+            {
                 'entity': '#myhashtag',
                 'entity_type': 'hashtag',
                 'followers': None,
                 'source': 'twitter',
                 'mentions': 2,
-                'interactions': 16
-            }]
+                'interactions': 16,
+                'date': datetime.date.today()
+            }
+        second_row = spew_res_iter_contents[0][1]
+        assert second_row == \
+            {
+                'entity': '#myhashtag',
+                'entity_type': 'hashtag',
+                'source': 'twitter',
+                'mentions': 3,
+                'interactions': 20,
+                'date': datetime.date.today() - datetime.timedelta(days=1)
+            }
+        third_row = spew_res_iter_contents[0][2]
+        assert third_row == \
+            {
+                'entity': '#myhashtag',
+                'entity_type': 'hashtag',
+                'source': 'twitter',
+                'mentions': 1,
+                'interactions': 7,
+                'date': datetime.date.today() - datetime.timedelta(days=2)
+            }
 
     @mock.patch('tweepy.auth.AppAuthHandler')
     @mock.patch('tweepy.API')

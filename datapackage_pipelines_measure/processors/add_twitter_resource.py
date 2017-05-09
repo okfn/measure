@@ -9,7 +9,6 @@ from datapackage_pipelines.generators import slugify
 from datapackage_pipelines.wrapper import ingest, spew
 
 from datapackage_pipelines_measure.config import settings
-from datapackage_pipelines_measure.datastore import get_datastore
 
 import logging
 log = logging.getLogger(__name__)
@@ -193,93 +192,49 @@ resource = {
 
 entity_type = _get_entity_type(entity)
 
-# Followers
-# This is requested directly from the twitter api
-
-followers_count = None
-if entity_type == 'account':
-    user = _get_user_account_from_twitter_api(entity)
-    followers_count = user.followers_count
-
-
 # Mentions & Interactions
-# These are requested for specified (and limited) timeframes from the twitter
-# api, then added to the previous result to get a total since we started
-# collecting data for the entity.
+# These are requested for specified (and limited) timeframes from Twitter
 
-# Get last run entity values
-filter_object = {
-    'entity': entity,
-    'entity_type': entity_type,
-    'source': 'twitter',
-    'project_id': project_id
-}
-datastore = get_datastore()
-entity_last_run = datastore.get_latest_from_table(filter_object,
-                                                  DATASTORE_TABLE)
-mentions = 0
-interactions = 0
-if entity_last_run:
-    latest_mentions = entity_last_run.get('mentions', 0)
-    latest_interactions = entity_last_run.get('interactions', 0)
-    if entity_last_run['timestamp'].date() == datetime.date.today():
-        # Last run today
-        log.debug('Last run for entity, "{}". was today.'.format(entity))
-        # Don't collect from twitter again, just reuse entity_last_run's data
-        mentions = latest_mentions
-        interactions = latest_interactions
-    elif entity_last_run['timestamp'].date() < datetime.date.today():
-        # Last run before today, get tweets from the last run date to
-        # yesterday.
-        log.debug('Last run for entity, "{}", was before today.'
-                  .format(entity))
-        end_date = datetime.date.today()  # end_date is exclusive (so yesteray)
-        start_date = entity_last_run['timestamp'].date()
-        mentions = _get_mentions_for_entity_from_source(
-            entity,
-            start_date.strftime(TWITTER_API_DATE_RANGE_FORMAT),
-            end_date.strftime(TWITTER_API_DATE_RANGE_FORMAT)
-        )
-        mentions = mentions + latest_mentions
-        interactions = _get_interactions_for_entity_from_source(
-            entity,
-            start_date.strftime(TWITTER_API_DATE_RANGE_FORMAT),
-            end_date.strftime(TWITTER_API_DATE_RANGE_FORMAT)
-        )
-        interactions = interactions + latest_interactions
-else:
-    # No last run for this entity.
-    log.debug('No last run for entity "{}"'.format(entity))
-    # Collect twitter data for entity for the last few days
-    end_date = datetime.date.today()  # end_date is exclusive (so yesterday)
-    start_date = (end_date - datetime.timedelta(
-        days=TWITTER_API_SEARCH_INDEX_LIMIT_IN_DAYS))
-    mentions = _get_mentions_for_entity_from_source(
-        entity,
-        start_date.strftime(TWITTER_API_DATE_RANGE_FORMAT),
-        end_date.strftime(TWITTER_API_DATE_RANGE_FORMAT)
-    )
-    interactions = _get_interactions_for_entity_from_source(
-        entity,
-        start_date.strftime(TWITTER_API_DATE_RANGE_FORMAT),
-        end_date.strftime(TWITTER_API_DATE_RANGE_FORMAT)
-    )
+# collect for the last three days, today, yesterday, day before yesterday
+today = datetime.date.today()
+yesterday = today - datetime.timedelta(days=1)
+day_before_yesterday = today - datetime.timedelta(days=2)
+days = [today, yesterday, day_before_yesterday]
 
-resource_content = {
-    'entity': entity,
-    'entity_type': entity_type,
-    'source': 'twitter',
-    'followers': followers_count,
-    'mentions': mentions,
-    'interactions': interactions
-}
+resource_content = []
 
-resource['schema'] = {
-    'fields': [{'name': h, 'type': 'string'} for h in resource_content.keys()]}
+for day in days:
+    start_date = day.strftime(TWITTER_API_DATE_RANGE_FORMAT)
+    end_date = day + datetime.timedelta(days=1)
+    end_date = end_date.strftime(TWITTER_API_DATE_RANGE_FORMAT)
+    mentions = _get_mentions_for_entity_from_source(entity, start_date,
+                                                    end_date)
+    interactions = _get_interactions_for_entity_from_source(entity, start_date,
+                                                            end_date)
+
+    row = {
+        'entity': entity,
+        'entity_type': entity_type,
+        'source': 'twitter',
+        'date': day,
+        'mentions': mentions,
+        'interactions': interactions
+    }
+
+    # Account followers are requested directly from the Twitter API for today.
+    if day == today:
+        followers_count = None
+        if entity_type == 'account':
+            user = _get_user_account_from_twitter_api(entity)
+            followers_count = user.followers_count
+        row['followers'] = followers_count
+
+    resource_content.append(row)
+
+# Get the basic resource schema from the first row
+resource['schema'] = {'fields': [{'name': h, 'type': 'string'}
+                                 for h in resource_content[0].keys()]}
 
 datapackage['resources'].append(resource)
-
-# Make a single-item generator from the resource_content
-resource_content = itertools.chain([resource_content])
 
 spew(datapackage, itertools.chain(res_iter, [resource_content]))
