@@ -31,7 +31,8 @@ def add_steps(steps: list, pipeline_id: str,
         'fields': {
             'repository': [],
             'watchers': [],
-            'stars': []}
+            'stars': [],
+            'source': []}
     }))
 
     steps.append(('set_types', {

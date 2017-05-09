@@ -1,23 +1,80 @@
 import os
 
-ROOT_PATH = os.path.join(os.path.dirname(__file__), '..', '..')
+from datapackage_pipelines_measure.config import settings
+
+
+DOWNLOADS_PATH = os.path.join(os.path.dirname(__file__), '../../downloads')
 
 label = 'social-media'
 
 
 def add_steps(steps: list, pipeline_id: str,
               project_id: str, config: dict) -> list:
-    return steps + [
-        ('add_resource', {
-            'name': 'test_resource',
-            'url': 'https://docs.google.com/spreadsheets/d/' +
-            '1vbhTuMDNCmxdo2rPkkya9v6X1f9eyqvSGsY5YcxlcLk/' +
-            'edit#gid=0'
-        }),
-        ('stream_remote_resources', {}),
-        ('measure.capitalise', {}),
-        ('dump.to_path', {
-            'out-path':
-                '{}/downloads/{}'.format(ROOT_PATH, pipeline_id)
-        })
-    ]
+    for entity in config['twitter']['entities']:
+        steps.append(('measure.add_twitter_resource', {
+            'entity': entity,
+            'project_id': project_id
+        }))
+
+    steps.append(('concatenate', {
+        'target': {
+            'name': 'social-media',
+            'path': 'data/social-media.json'},
+        'fields': {
+            'entity': [],
+            'entity_type': [],
+            'source': [],
+            'date': [],
+            'followers': [],
+            'mentions': [],
+            'interactions': []}
+    }))
+
+    steps.append(('set_types', {
+        'types': {
+            'entity': {
+                'type': 'string',
+            },
+            'entity_type': {
+                'type': 'string'
+            },
+            'source': {
+                'type': 'string'
+            },
+            'date': {
+                'type': 'date',
+            },
+            'followers': {
+                'type': 'integer'
+            },
+            'mentions': {
+                'type': 'integer'
+            },
+            'interactions': {
+                'type': 'integer'
+            }
+        }
+    }))
+
+    steps.append(('measure.add_project_name', {'name': project_id}))
+    steps.append(('measure.add_timestamp'))
+    steps.append(('measure.add_uuid'))
+
+    # temporarily dump to path for development
+    steps.append(('dump.to_path', {
+        'out-path': '{}/{}'.format(DOWNLOADS_PATH, pipeline_id)
+    }))
+
+    steps.append(('dump.to_sql', {
+        'engine': settings.DB_ENGINE,
+        'tables': {
+            'socialmedia': {
+                'resource-name': 'social-media',
+                'mode': 'update',
+                'update_keys': ['entity', 'entity_type',
+                                'source', 'project_id', 'date']
+            }
+        }
+    }))
+
+    return steps
