@@ -30,6 +30,7 @@ def add_steps(steps: list, pipeline_id: str,
             'entity': [],
             'entity_type': [],
             'source': [],
+            'date': [],
             'followers': [],
             'mentions': [],
             'interactions': [],
@@ -46,6 +47,9 @@ def add_steps(steps: list, pipeline_id: str,
             },
             'source': {
                 'type': 'string'
+            },
+            'date': {
+                'type': 'date',
             },
             'followers': {
                 'type': 'integer'
@@ -76,7 +80,9 @@ def add_steps(steps: list, pipeline_id: str,
         'tables': {
             'socialmedia': {
                 'resource-name': 'social-media',
-                'mode': 'append'
+                'mode': 'update',
+                'update_keys': ['entity', 'entity_type',
+                                'source', 'project_id', 'date']
             }
         }
     }))

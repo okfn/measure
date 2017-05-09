@@ -1,3 +1,9 @@
+'''This processor adds a timestamp for the datetime of collection.
+
+Note: the collection date may not reflect the date the data collected pertains
+to, especially for historic data.
+'''
+
 import datetime
 
 from datapackage_pipelines.wrapper import process
