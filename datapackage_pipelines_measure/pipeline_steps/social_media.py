@@ -25,7 +25,7 @@ def add_steps(steps: list, pipeline_id: str,
     steps.append(('concatenate', {
         'target': {
             'name': 'social-media',
-            'path': 'data/social-media.json'},
+            'path': 'data/social-media.csv'},
         'fields': {
             'entity': [],
             'entity_type': [],
