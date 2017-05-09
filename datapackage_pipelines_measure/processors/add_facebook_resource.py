@@ -212,7 +212,7 @@ entity = parameters['entity']
 safe_entity = slugify(entity).lower()
 resource = {
     'name': safe_entity,
-    'path': 'data/{}.json'.format(safe_entity)
+    'path': 'data/{}.csv'.format(safe_entity)
 }
 entity_type = 'page'
 

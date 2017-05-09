@@ -188,7 +188,7 @@ project_id = parameters['project_id']
 safe_entity = _get_safe_entity(entity)
 resource = {
     'name': safe_entity,
-    'path': 'data/{}.json'.format(safe_entity)
+    'path': 'data/{}.csv'.format(safe_entity)
 }
 
 entity_type = _get_entity_type(entity)
