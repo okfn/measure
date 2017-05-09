@@ -71,17 +71,6 @@ def get_cursor_items_iter(items):
     return MockCursorIterable(items)
 
 
-class MockDatastore():
-    '''A Mock Datastore.'''
-
-    def __init__(self, latest):
-        self.latest = latest
-
-    def get_latest_from_table(self, *args):
-        '''Return the object saved during init.'''
-        return self.latest
-
-
 class TestMeasureTwitterProcessor(unittest.TestCase):
 
     @mock.patch('tweepy.Cursor')
@@ -100,11 +89,7 @@ class TestMeasureTwitterProcessor(unittest.TestCase):
         mock_api.return_value = my_mock_api
         mock_cursor.return_value.items.side_effect = [
             get_cursor_items_iter(my_mock_api.search()),
-            get_cursor_items_iter(my_mock_api.user_timeline()),
-            get_cursor_items_iter(my_mock_api.search()),
-            get_cursor_items_iter(my_mock_api.user_timeline()),
-            get_cursor_items_iter(my_mock_api.search()),
-            get_cursor_items_iter(my_mock_api.user_timeline()),
+            get_cursor_items_iter(my_mock_api.user_timeline())
         ]
 
         # input arguments used by our mock `ingest`
@@ -134,34 +119,17 @@ class TestMeasureTwitterProcessor(unittest.TestCase):
         spew_res_iter_contents = list(spew_res_iter)
 
         # Three rows in first resource
-        assert len(spew_res_iter_contents[0]) == 3
+        assert len(spew_res_iter_contents[0]) == 1
 
-        # Get first row from resource (today)
+        # Get first row from resource (yesterday)
         first_row = list(spew_res_iter_contents[0])[0]
         # followers is updated from api
-        assert first_row['date'] == datetime.date.today()
-        assert first_row['followers'] == 5
-        # the others are updated from today's stored result
-        assert first_row['mentions'] == 2
-        assert first_row['interactions'] == 0
-
-        # Get second row from resource (yesterday)
-        second_row = list(spew_res_iter_contents[0])[1]
-        # followers is updated from api
-        assert second_row['date'] == \
+        assert first_row['date'] == \
             datetime.date.today() - datetime.timedelta(days=1)
         # the others are updated from today's stored result
-        assert second_row['mentions'] == 2
-        assert second_row['interactions'] == 15
-
-        # Get third row from resource (day before yesterday)
-        third_row = list(spew_res_iter_contents[0])[2]
-        # followers is updated from api
-        assert third_row['date'] == \
-            datetime.date.today() - datetime.timedelta(days=2)
-        # the others are updated from today's stored result
-        assert third_row['mentions'] == 2
-        assert third_row['interactions'] == 9
+        assert first_row['mentions'] == 2
+        assert first_row['interactions'] == 15
+        assert first_row['followers'] == 5
 
     @mock.patch('tweepy.Cursor')
     @mock.patch('tweepy.auth.AppAuthHandler')
@@ -172,11 +140,6 @@ class TestMeasureTwitterProcessor(unittest.TestCase):
         # mock the twitter api response
         mock_auth.return_value = 'authed'
         mock_api.return_value = my_mock_api
-        today = datetime.date.today()
-        todays_statuses = [
-            Status('okfnlabs', 2, 5, today),
-            Status('anonymous', 3, 6, today)
-        ]
         yesterday = \
             datetime.datetime.now() - datetime.timedelta(days=1)
         yesterdays_statuses = [
@@ -184,14 +147,8 @@ class TestMeasureTwitterProcessor(unittest.TestCase):
             Status('anonymous', 3, 0, yesterday),
             Status('anonymous', 3, 8, yesterday)
         ]
-        day_before_yesterday = yesterday - datetime.timedelta(days=1)
-        before_yesterdays_statuses = [
-            Status('okfnlabs', 2, 5, day_before_yesterday)
-        ]
         mock_cursor.return_value.items.side_effect = [
-            get_cursor_items_iter(todays_statuses),
-            get_cursor_items_iter(yesterdays_statuses),
-            get_cursor_items_iter(before_yesterdays_statuses)
+            get_cursor_items_iter(yesterdays_statuses)
         ]
 
         # input arguments used by our mock `ingest`
@@ -231,38 +188,18 @@ class TestMeasureTwitterProcessor(unittest.TestCase):
 
         # Asserts for the res_iter
         spew_res_iter_contents = list(spew_res_iter)
-        assert len(spew_res_iter_contents[0]) == 3
+        assert len(spew_res_iter_contents[0]) == 1
 
         first_row = spew_res_iter_contents[0][0]
         assert first_row == \
             {
                 'entity': '#myhashtag',
                 'entity_type': 'hashtag',
+                'source': 'twitter',
                 'followers': None,
-                'source': 'twitter',
-                'mentions': 2,
-                'interactions': 16,
-                'date': datetime.date.today()
-            }
-        second_row = spew_res_iter_contents[0][1]
-        assert second_row == \
-            {
-                'entity': '#myhashtag',
-                'entity_type': 'hashtag',
-                'source': 'twitter',
                 'mentions': 3,
                 'interactions': 20,
                 'date': datetime.date.today() - datetime.timedelta(days=1)
-            }
-        third_row = spew_res_iter_contents[0][2]
-        assert third_row == \
-            {
-                'entity': '#myhashtag',
-                'entity_type': 'hashtag',
-                'source': 'twitter',
-                'mentions': 1,
-                'interactions': 7,
-                'date': datetime.date.today() - datetime.timedelta(days=2)
             }
 
     @mock.patch('tweepy.auth.AppAuthHandler')

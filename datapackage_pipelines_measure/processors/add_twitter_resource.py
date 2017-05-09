@@ -195,41 +195,36 @@ entity_type = _get_entity_type(entity)
 # Mentions & Interactions
 # These are requested for specified (and limited) timeframes from Twitter
 
-# collect for the last three days, today, yesterday, day before yesterday
-today = datetime.date.today()
-yesterday = today - datetime.timedelta(days=1)
-day_before_yesterday = today - datetime.timedelta(days=2)
-days = [today, yesterday, day_before_yesterday]
+yesterday = datetime.date.today() - datetime.timedelta(days=1)
 
 resource_content = []
 
-for day in days:
-    start_date = day.strftime(TWITTER_API_DATE_RANGE_FORMAT)
-    end_date = day + datetime.timedelta(days=1)
-    end_date = end_date.strftime(TWITTER_API_DATE_RANGE_FORMAT)
-    mentions = _get_mentions_for_entity_from_source(entity, start_date,
-                                                    end_date)
-    interactions = _get_interactions_for_entity_from_source(entity, start_date,
-                                                            end_date)
+start_date = yesterday.strftime(TWITTER_API_DATE_RANGE_FORMAT)
+end_date = yesterday + datetime.timedelta(days=1)
+end_date = end_date.strftime(TWITTER_API_DATE_RANGE_FORMAT)
+mentions = _get_mentions_for_entity_from_source(entity, start_date,
+                                                end_date)
+interactions = _get_interactions_for_entity_from_source(entity, start_date,
+                                                        end_date)
 
-    row = {
-        'entity': entity,
-        'entity_type': entity_type,
-        'source': 'twitter',
-        'date': day,
-        'mentions': mentions,
-        'interactions': interactions
-    }
+row = {
+    'entity': entity,
+    'entity_type': entity_type,
+    'source': 'twitter',
+    'date': yesterday,
+    'mentions': mentions,
+    'interactions': interactions
+}
 
-    # Account followers are requested directly from the Twitter API for today.
-    if day == today:
-        followers_count = None
-        if entity_type == 'account':
-            user = _get_user_account_from_twitter_api(entity)
-            followers_count = user.followers_count
-        row['followers'] = followers_count
+# Account followers are requested directly from the Twitter API for today (but
+# assigned to yesterday's row).
+followers_count = None
+if entity_type == 'account':
+    user = _get_user_account_from_twitter_api(entity)
+    followers_count = user.followers_count
+row['followers'] = followers_count
 
-    resource_content.append(row)
+resource_content.append(row)
 
 # Get the basic resource schema from the first row
 resource['schema'] = {'fields': [{'name': h, 'type': 'string'}
