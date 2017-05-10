@@ -114,10 +114,10 @@ class TestMeasureTwitterProcessor(unittest.TestCase):
         # Asserts for the res_iter
         spew_res_iter_contents = list(spew_res_iter)
 
-        # Three rows in first resource
+        # One rows in first resource
         assert len(spew_res_iter_contents[0]) == 1
 
-        # Get first row from resource (yesterday)
+        # Get row from resource
         first_row = list(spew_res_iter_contents[0])[0]
         # followers is updated from api
         assert first_row['date'] == \

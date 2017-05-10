@@ -9,7 +9,6 @@ from datapackage_pipelines.generators import slugify
 from datapackage_pipelines.wrapper import ingest, spew
 
 from datapackage_pipelines_measure.config import settings
-from datapackage_pipelines_measure.datastore import get_datastore
 
 import logging
 log = logging.getLogger(__name__)
@@ -63,11 +62,10 @@ def _request_data_from_facebook_api(page, metrics, period, since, until):
         'since': since,
         'until': until
     }
-    try:
-        response = graph.request(path=path, args=args)
-    except facebook_sdk.GraphAPIError as e:
-        raise e
-    if not response['data']:
+
+    response = graph.request(path=path, args=args)
+
+    if not response.get('data', False):
         raise ValueError('Facebook request returned no data.')
     return response
 
@@ -174,7 +172,7 @@ def _get_daily_metrics_from_source(page, start_date, end_date):
     aggregated_metrics = collections.defaultdict(int)
 
     start_date_frame = start_date
-    while start_date_frame + datetime.timedelta(days=1) < end_date:
+    while start_date_frame + datetime.timedelta(days=1) <= end_date:
         days_in_frame = _get_number_of_days_in_frame(start_date_frame,
                                                      end_date)
         end_date_frame = start_date_frame + datetime.timedelta(
@@ -216,76 +214,40 @@ resource = {
 }
 entity_type = 'page'
 
-resource_content = {
+resource_content = []
+
+row = {
     'entity': entity,
     'entity_type': entity_type,
     'source': 'facebook'
 }
 
 lifetime_metrics = _get_lifetime_metrics_from_source(entity)
-resource_content.update({
+row.update({
     'followers': lifetime_metrics['page_fans']
 })
 
-# Get last run entity values
-filter_object = {
-    'entity': entity,
-    'entity_type': entity_type,
-    'source': 'facebook',
-    'project_id': project_id
-}
-datastore = get_datastore()
-entity_last_run = datastore.get_latest_from_table(filter_object,
-                                                  DATASTORE_TABLE)
+today = datetime.date.today()
+yesterday = today - datetime.timedelta(days=1)
+end_date = today  # end_date is exclusive (so yesterday)
+start_date = yesterday
+daily_metrics = _get_daily_metrics_from_source(entity, start_date, end_date)
+interactions = daily_metrics['page_stories']
+impressions = daily_metrics['page_impressions']
+mentions = daily_metrics['page_stories_by_story_type']
 
-mentions = 0
-interactions = 0
-impressions = 0
-if entity_last_run:
-    latest_mentions = entity_last_run.get('mentions', 0)
-    latest_interactions = entity_last_run.get('interactions', 0)
-    latest_impressions = entity_last_run.get('impressions', 0)
-    if entity_last_run['timestamp'].date() == datetime.date.today():
-        log.debug('Last run for entity, "{}", was today.'.format(entity))
-        # Last run today, so don't collect, use data from entity_last_run.
-        mentions = latest_mentions
-        interactions = latest_interactions
-        impressions = latest_impressions
-    elif entity_last_run['timestamp'].date() < datetime.date.today():
-        # Last run before today, get data from the last run date to yesterday.
-        log.debug('Last run for entity, "{}", was before today.'
-                  .format(entity))
-        end_date = datetime.date.today()  # end_date is exclusive (so yesteray)
-        start_date = entity_last_run['timestamp'].date()
-        daily_metrics = _get_daily_metrics_from_source(entity, start_date,
-                                                       end_date)
-        interactions = latest_interactions + daily_metrics['page_stories']
-        impressions = latest_impressions + daily_metrics['page_impressions']
-        mentions = \
-            latest_mentions + daily_metrics['page_stories_by_story_type']
-else:
-    # No last run, this is the first entry for this entity.
-    # Collect historic facebook data for entity from the default start date.
-    end_date = datetime.date.today()  # end_date is exclusive (so yesterday)
-    start_date = dateutil.parser.parse(_get_default_start_date()).date()
-    daily_metrics = _get_daily_metrics_from_source(entity, start_date,
-                                                   end_date)
-    interactions = daily_metrics['page_stories']
-    impressions = daily_metrics['page_impressions']
-    mentions = daily_metrics['page_stories_by_story_type']
-
-resource_content.update({
+row.update({
     'mentions': mentions,
     'interactions': interactions,
-    'impressions': impressions
+    'impressions': impressions,
+    'date': yesterday
 })
 
-resource['schema'] = {
-    'fields': [{'name': h, 'type': 'string'} for h in resource_content.keys()]}
+resource_content.append(row)
+
+resource['schema'] = {'fields': [{'name': h, 'type': 'string'}
+                                 for h in resource_content[0].keys()]}
 
 datapackage['resources'].append(resource)
-
-# Make a single-item generator from the resource_content
-resource_content = itertools.chain([resource_content])
 
 spew(datapackage, itertools.chain(res_iter, [resource_content]))
