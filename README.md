@@ -91,8 +91,8 @@ config:
 
 The Twitter processor collects data about each entity listed in the `entities` section. Entities can be either a twitter hashtag (starting with `#`) or an account name (starting with a `@`). For each entity, the processor collects:
 
-- **mentions**: an accumulated total of tweets mentioning the entity
-- **interactions**: an accumulated total of 'favorites' and 'retweets' for tweets mentioning the hashtag, or tweets authored by the account.
+- **mentions**: total of tweets mentioning the entity for the period (day)
+- **interactions**: total of 'favorites' and 'retweets' for tweets mentioning the hashtag, or tweets authored by the account, for the period (day).
 
 And additionally, for account entities:
 - the current number of **followers**
@@ -112,9 +112,9 @@ config:
 
 The Facebook processor collects data about each page listed in the `pages` section. For each page, the processor collects:
 
-- **impressions**: The total number of impressions seen of any content associated with your Page, since the page was created. This metric is referred to as **"Page Impressions"** (See [here](https://developers.facebook.com/docs/graph-api/reference/v2.7/insights#page_impressions)).
-- **interactions**: The total number of _stories_ created about your Page, since it's creation. Stories include: liking your Page, posting to your Page's Wall, liking, commenting on or sharing one of your Page posts, answering a Question you posted, RSVPing to one of your events, mentioning your Page, photo-tagging your Page or checking in at your Place. This metric is referred to as **"Page Stories"** (See _Page and Post Stories and "People talking about this"_ on [Insights](https://developers.facebook.com/docs/graph-api/reference/v2.7/insight)).
-- **mentions**: The total number of times a page was "tagged" since it's creation. This metric is a subset of _interactions_.
+- **impressions**: The total number of impressions seen of any content associated with your Page, for the collection period (day). This metric is referred to as **"Page Impressions"** (See [here](https://developers.facebook.com/docs/graph-api/reference/v2.7/insights#page_impressions)).
+- **interactions**: The total number of _stories_ created about your Page, for the period (day). Stories include: liking your Page, posting to your Page's Wall, liking, commenting on or sharing one of your Page posts, answering a Question you posted, RSVPing to one of your events, mentioning your Page, photo-tagging your Page or checking in at your Place. This metric is referred to as **"Page Stories"** (See _Page and Post Stories and "People talking about this"_ on [Insights](https://developers.facebook.com/docs/graph-api/reference/v2.7/insight)).
+- **mentions**: The total number of times a page was "tagged" for the period (day). This metric is a subset of _interactions_.
 - **followers**: The total number of Facebook Users who "liked" the page. This metric is referred to as **"page fans"**. (See _Page User Demographics_ on [Insights](https://developers.facebook.com/docs/graph-api/reference/v2.7/insight)
 
 ```yaml
