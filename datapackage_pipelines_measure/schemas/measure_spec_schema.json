@@ -4,13 +4,51 @@
   "properties": {
     "project": { "type": "string" },
     "config": {
-        "type": "object",
-        "properties": {
-            "social-media": {"type": "object"},
-            "code-hosting": {"type": "object"},
-            "code-packaging": {"type": "object"}
+      "type": "object",
+      "properties": {
+        "social-media": {
+          "type": "object",
+          "properties": {
+            "twitter": {
+              "type": "object",
+              "properties": {
+                "entities": {
+                  "type": "array"
+                }
+              },
+              "required": ["entities"]
+            },
+            "facebook": {
+              "type": "object",
+              "properties": {
+                "pages": {
+                  "type": "array"
+                }
+              },
+              "required": ["pages"]
+            }
+          }
+        },
+        "code-hosting": {
+          "type": "object",
+          "properties": {
+            "github": {
+              "type": "object",
+              "properties": {
+                "repositories": {
+                  "type": "array"
+                }
+              },
+              "required": ["repositories"]
+            }
+          }
+        },
+        "code-packaging": {
+          "type": "object"
         }
+      }
     }
   },
   "required": ["project", "config"]
 }
+
