@@ -77,7 +77,7 @@ def add_steps(steps: list, pipeline_id: str,
         }))
 
     steps.append(('dump.to_sql', {
-        'engine': settings.DB_ENGINE,
+        'engine': settings.get('DB_ENGINE'),
         'tables': {
             'socialmedia': {
                 'resource-name': 'social-media',
