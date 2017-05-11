@@ -5,7 +5,8 @@ import pkgutil
 from datapackage_pipelines.generators import (
     GeneratorBase,
     steps,
-    slugify
+    slugify,
+    SCHEDULE_DAILY
 )
 
 from . import pipeline_steps
@@ -47,7 +48,7 @@ class Generator(GeneratorBase):
     @classmethod
     def generate_pipeline(cls, source):
         project_id = slugify(source['project'])
-        schedule = None
+        schedule = SCHEDULE_DAILY
 
         discovered_steps = cls._get_pipeline_steps()
 
@@ -77,6 +78,8 @@ class Generator(GeneratorBase):
                 'pipeline': _steps
             }
             if schedule is not None:
-                pipeline_details['schedule']['crontab'] = schedule
+                pipeline_details['schedule'] = {
+                    'crontab': schedule
+                }
 
             yield pipeline_id, pipeline_details
