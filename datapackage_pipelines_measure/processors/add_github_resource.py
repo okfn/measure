@@ -23,10 +23,11 @@ except json.decoder.JSONDecodeError:
     log.error('Expected JSON in response from: {}'.format(repo_url))
     raise
 
+resource_content = []
 # remap retrieved dict to scheme in parameters
-resource_content = {t_key: repo_content[s_key]
-                    for t_key, s_key in parameters['map_fields'].items()}
-resource_content['source'] = 'github'
+row = {t_key: repo_content[s_key]
+       for t_key, s_key in parameters['map_fields'].items()}
+row['source'] = 'github'
 
 resource = {
     'name': name,
@@ -36,11 +37,10 @@ resource = {
 # Temporarily set all types to string, will use `set_types` processor in
 # pipeline to assign correct types
 resource['schema'] = {
-    'fields': [{'name': h, 'type': 'string'} for h in resource_content.keys()]}
+    'fields': [{'name': h, 'type': 'string'} for h in row.keys()]}
 
 datapackage['resources'].append(resource)
 
-# Make a single-item generator from the resource_content
-resource_content = itertools.chain([resource_content])
+resource_content.append(row)
 
 spew(datapackage, itertools.chain(res_iter, [resource_content]))
