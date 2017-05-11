@@ -70,7 +70,8 @@ class TestMeasureGithubProcessor(unittest.TestCase):
         assert dp_resources[0]['name'] == 'hello'
         field_names = \
             [field['name'] for field in dp_resources[0]['schema']['fields']]
-        assert field_names == ['repository', 'watchers', 'stars', 'source']
+        assert field_names == ['repository', 'watchers',
+                               'stars', 'source', 'date']
 
         # Asserts for the res_iter
         spew_res_iter_contents = list(spew_res_iter)
@@ -80,7 +81,8 @@ class TestMeasureGithubProcessor(unittest.TestCase):
                 'repository': 'my-repository',
                 'watchers': 4,
                 'stars': 1,
-                'source': 'github'
+                'source': 'github',
+                'date': datetime.date.today()
             }]
 
 

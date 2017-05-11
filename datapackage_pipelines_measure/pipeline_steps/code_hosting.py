@@ -32,7 +32,8 @@ def add_steps(steps: list, pipeline_id: str,
             'repository': [],
             'watchers': [],
             'stars': [],
-            'source': []}
+            'source': [],
+            'date': []}
     }))
 
     steps.append(('set_types', {
@@ -45,7 +46,10 @@ def add_steps(steps: list, pipeline_id: str,
             },
             'stars': {
                 'type': 'integer'
-            }
+            },
+            'date': {
+                'type': 'date',
+            },
         }
     }))
 
@@ -64,7 +68,8 @@ def add_steps(steps: list, pipeline_id: str,
         'tables': {
             'codehosting': {
                 'resource-name': 'code-hosting',
-                'mode': 'append'
+                'mode': 'update',
+                'update_keys': ['repository', 'source', 'project_id', 'date']
             }
         }
     }))

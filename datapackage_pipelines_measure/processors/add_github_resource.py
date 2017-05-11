@@ -1,4 +1,5 @@
 import json
+import datetime
 import itertools
 
 import requests
@@ -28,6 +29,7 @@ resource_content = []
 row = {t_key: repo_content[s_key]
        for t_key, s_key in parameters['map_fields'].items()}
 row['source'] = 'github'
+row['date'] = datetime.date.today()
 
 resource = {
     'name': name,
