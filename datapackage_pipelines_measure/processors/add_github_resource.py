@@ -13,9 +13,9 @@ parameters, datapackage, res_iter = ingest()
 
 name = str(parameters['name'])
 repo = parameters.get('repo')
-repo_url = '{}{}?access_token={}'.format(settings.GITHUB_API_BASE_URL,
+repo_url = '{}{}?access_token={}'.format(settings['GITHUB_API_BASE_URL'],
                                          repo,
-                                         settings.GITHUB_API_TOKEN)
+                                         settings['GITHUB_API_TOKEN'])
 
 try:
     repo_content = requests.get(repo_url).json()

@@ -47,10 +47,10 @@ def _request_data_from_facebook_api(page, metrics, period, since, until):
         '''Get the access token for the given page from the config'''
         token_name = 'FACEBOOK_API_ACCESS_TOKEN_' + page.upper()
         try:
-            return getattr(settings, token_name)
-        except AttributeError:
-            raise RuntimeError('No Facebook Page Access Token found for '
-                               'page: "{}" in settings'.format(page))
+            return settings[token_name]
+        except KeyError:
+            raise KeyError('No Facebook Page Access Token found for '
+                           'page: "{}" in settings'.format(page))
 
     graph.access_token = _get_page_access_token_from_config(page)
     path = '{version}/{page}/insights/'.format(version=FACEBOOK_API_VERSION,
@@ -198,8 +198,8 @@ def _get_default_start_date():
     fallback to the module variable. This enables tests to override the value.
     '''
     try:
-        return settings.FACEBOOK_API_DEFAULT_START_DATE
-    except AttributeError:
+        return settings['FACEBOOK_API_DEFAULT_START_DATE']
+    except KeyError:
         return FACEBOOK_API_DEFAULT_START_DATE
 
 

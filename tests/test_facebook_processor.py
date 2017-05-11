@@ -208,5 +208,5 @@ class TestMeasureFacebookProcessor(unittest.TestCase):
         # returned to `spew`.
         error_msg = 'No Facebook Page Access Token found for page:'
         ' "NoPage" in settings'
-        with self.assertRaises(RuntimeError, msg=error_msg):
+        with self.assertRaises(KeyError, msg=error_msg):
             mock_processor_test(processor_path, (params, datapackage, []))
