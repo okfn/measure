@@ -53,13 +53,14 @@ def add_steps(steps: list, pipeline_id: str,
     steps.append(('measure.add_timestamp'))
     steps.append(('measure.add_uuid'))
 
-    # temporarily dump to path for development
-    steps.append(('dump.to_path', {
-        'out-path': '{}/{}'.format(DOWNLOADS_PATH, pipeline_id)
-    }))
+    # Dump to path if in development mode
+    if settings.get('DEVELOPMENT', False):
+        steps.append(('dump.to_path', {
+            'out-path': '{}/{}'.format(DOWNLOADS_PATH, pipeline_id)
+        }))
 
     steps.append(('dump.to_sql', {
-        'engine': settings.DB_ENGINE,
+        'engine': settings['DB_ENGINE'],
         'tables': {
             'codehosting': {
                 'resource-name': 'code-hosting',

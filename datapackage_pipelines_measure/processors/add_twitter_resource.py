@@ -46,8 +46,8 @@ def _get_safe_entity(entity):
 
 def _get_twitter_api_handler():
     '''Initialize a twitter API handler with an App access token'''
-    auth = tweepy.auth.AppAuthHandler(settings.TWITTER_API_CONSUMER_KEY,
-                                      settings.TWITTER_API_CONSUMER_SECRET)
+    auth = tweepy.auth.AppAuthHandler(settings['TWITTER_API_CONSUMER_KEY'],
+                                      settings['TWITTER_API_CONSUMER_SECRET'])
     return tweepy.API(auth)
 
 
