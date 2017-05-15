@@ -33,7 +33,7 @@ row['date'] = datetime.date.today()
 
 resource = {
     'name': name,
-    'path': 'data/{}.json'.format(name)
+    'path': 'data/{}.csv'.format(name)
 }
 
 # Temporarily set all types to string, will use `set_types` processor in
