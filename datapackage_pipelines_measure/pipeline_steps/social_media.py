@@ -10,17 +10,20 @@ label = 'social-media'
 
 def add_steps(steps: list, pipeline_id: str,
               project_id: str, config: dict) -> list:
-    for entity in config['twitter']['entities']:
-        steps.append(('measure.add_twitter_resource', {
-            'entity': entity,
-            'project_id': project_id
-        }))
 
-    for page in config['facebook']['pages']:
-        steps.append(('measure.add_facebook_resource', {
-            'entity': page,
-            'project_id': project_id
-        }))
+    if 'twitter' in config:
+        for entity in config['twitter']['entities']:
+            steps.append(('measure.add_twitter_resource', {
+                'entity': entity,
+                'project_id': project_id
+            }))
+
+    if 'facebook' in config:
+        for page in config['facebook']['pages']:
+            steps.append(('measure.add_facebook_resource', {
+                'entity': page,
+                'project_id': project_id
+            }))
 
     steps.append(('concatenate', {
         'target': {
