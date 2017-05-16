@@ -1,0 +1,51 @@
+remove_resource
+--
+{
+    "name": "remove-me"
+}
+--
+{
+    "name": "test",
+    "resources": [
+        {
+            "name": "hello-world",
+            "path": "hi.csv",
+            "schema": { "fields": [
+                {"name": "hello", "type": "string"}
+            ]}
+        },
+        {
+            "name": "remove-me",
+            "path": "remove-me.csv",
+            "schema": { "fields": [
+                {"name": "header", "type": "string"}
+            ]}
+        }
+    ]
+}
+--
+{"hello": "world"}
+
+{"header": "this will be removed"}
+--
+{
+  "name": "test",
+  "resources": [
+    {
+      "name": "hello-world",
+      "path": "hi.csv",
+      "schema": {
+        "fields": [
+          {
+            "name": "hello",
+            "type": "string"
+          }
+        ]
+      }
+    }
+  ]
+}
+--
+{"hello": "world"}
+
+{}

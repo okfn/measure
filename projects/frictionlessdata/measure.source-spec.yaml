@@ -14,28 +14,31 @@ config:
 
   code-packaging:
     npm:
-      url: 'http://example.com'
+      packages:
+        - 'jsontableschema'
+        - 'goodtables'
+        - 'tableschema'
 
   code-hosting:
     github:
       repositories:
-          - "frictionlessdata/jsontableschema-models-js"
-          - "frictionlessdata/datapackage-pipelines"
-          - "frictionlessdata/jsontableschema-js"
-          - "frictionlessdata/goodtables-py"
-          - "frictionlessdata/tabulator-py"
-          - "frictionlessdata/jsontableschema-py"
-          - "frictionlessdata/jsontableschema-sql-py"
-          - "frictionlessdata/datapackage-py"
-          - "frictionlessdata/jsontableschema-pandas-py"
-          - "frictionlessdata/jsontableschema-bigquery-py"
-          - "frictionlessdata/goodtables-web"
-          - "frictionlessdata/data-quality-dashboard"
-          - "frictionlessdata/data-quality-cli"
-          - "frictionlessdata/goodtables.io"
-          - "frictionlessdata/data-quality-spec"
-          - "frictionlessdata/datapackage-js"
-          - "frictionlessdata/dpm"
-          - "frictionlessdata/datapackage-r"
-          - "frictionlessdata/datapackagist"
-          - "frictionlessdata/goodtables-js"
+        - "frictionlessdata/jsontableschema-models-js"
+        - "frictionlessdata/datapackage-pipelines"
+        - "frictionlessdata/jsontableschema-js"
+        - "frictionlessdata/goodtables-py"
+        - "frictionlessdata/tabulator-py"
+        - "frictionlessdata/jsontableschema-py"
+        - "frictionlessdata/jsontableschema-sql-py"
+        - "frictionlessdata/datapackage-py"
+        - "frictionlessdata/jsontableschema-pandas-py"
+        - "frictionlessdata/jsontableschema-bigquery-py"
+        - "frictionlessdata/goodtables-web"
+        - "frictionlessdata/data-quality-dashboard"
+        - "frictionlessdata/data-quality-cli"
+        - "frictionlessdata/goodtables.io"
+        - "frictionlessdata/data-quality-spec"
+        - "frictionlessdata/datapackage-js"
+        - "frictionlessdata/dpm"
+        - "frictionlessdata/datapackage-r"
+        - "frictionlessdata/datapackagist"
+        - "frictionlessdata/goodtables-js"

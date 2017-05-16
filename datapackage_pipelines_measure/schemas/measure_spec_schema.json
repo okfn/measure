@@ -44,7 +44,18 @@
           }
         },
         "code-packaging": {
-          "type": "object"
+          "type": "object",
+          "properties": {
+            "npm": {
+              "type": "object",
+              "properties": {
+                "packages": {
+                  "type": "array"
+                }
+              },
+              "required": ["packages"]
+            }
+          }
         }
       }
     }
