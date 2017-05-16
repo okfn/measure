@@ -6,8 +6,6 @@ import requests
 from datapackage_pipelines.generators import slugify
 from datapackage_pipelines.wrapper import ingest, spew
 
-# from datapackage_pipelines_measure.config import settings
-
 import logging
 log = logging.getLogger(__name__)
 
@@ -163,9 +161,7 @@ def process_resources(res_iter, datapackage, package):
         return latest_date, iter(my_rows)
 
     if len(datapackage['resources']):
-        log.debug('there is a resource')
         if datapackage['resources'][0]['name'] == 'latest-project-entries':
-            log.debug('with the right name')
             latest_date, latest_iter = get_latest_date(next(res_iter))
             yield latest_iter
         else:

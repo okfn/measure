@@ -98,6 +98,95 @@ class TestMeasureNPMProcessor(unittest.TestCase):
             datetime.date.today() - datetime.timedelta(days=1)
 
     @requests_mock.mock()
+    def test_add_npm_resource_processor_empty_latest(self, mock_request):
+        '''latest-project-entries is present, but empty.'''
+
+        day_range = 5
+        now = datetime.datetime.now()
+        # package created five days ago
+        created = now - datetime.timedelta(days=day_range)
+        created = created.strftime("%Y-%m-%d")
+        mock_registry = {
+            'time': {
+                'created': created
+            }
+        }
+        mock_api_responses = []
+        for day in reversed(range(1, day_range)):
+            start = now - datetime.timedelta(days=day)
+            start = start.strftime("%Y-%m-%d")
+            mock_api_responses.append({
+                'json': {
+                    'downloads': day,
+                    'start': start,
+                    'end': start,
+                    'package': 'my_package'
+                },
+                'status_code': 200
+            })
+        mock_request.get('https://registry.npmjs.org/my_package',
+                         json=mock_registry)
+        matcher = re.compile('api.npmjs.org/downloads/point/')
+        mock_request.get(matcher, mock_api_responses)
+
+        # input arguments used by our mock `ingest`
+        datapackage = {
+            'name': 'my-datapackage',
+            'project': 'my-project',
+            'resources': [{
+                'name': 'latest-project-entries',
+                'schema': {
+                    'fields': [
+                        {'name': 'date', 'type': 'date'},
+                        {'name': 'downloads', 'type': 'int'},
+                        {'name': 'package', 'type': 'string'},
+                        {'name': 'source', 'type': 'string'},
+                    ]
+                }
+            }]
+        }
+        params = {
+            'name': 'hello',
+            'package': 'my_package',
+            'project_id': 'my-project'
+        }
+
+        # Path to the processor we want to test
+        processor_dir = \
+            os.path.dirname(datapackage_pipelines_measure.processors.__file__)
+        processor_path = os.path.join(processor_dir, 'add_npm_resource.py')
+
+        # Trigger the processor with our mock `ingest` and capture what it will
+        # returned to `spew`.
+        spew_args, _ = \
+            mock_processor_test(processor_path,
+                                (params, datapackage, iter([{}])))
+
+        # spew_dp = spew_args[0]
+        spew_res_iter = spew_args[1]
+
+        # two resources
+        resources = list(spew_res_iter)
+        assert len(resources) == 2
+
+        # No rows in first resource
+        assert len(list(resources[0])) == 0
+
+        # rows in second resource
+        rows = list(resources)[1]
+        assert len(rows) == 4
+        # row asserts
+        assert rows[0] == {
+            'date': datetime.date.today() - datetime.timedelta(days=4),
+            'downloads': 4,
+            'package': 'my_package',
+            'source': 'npm'
+        }
+        assert rows[3]['downloads'] == 1
+        assert rows[3]['date'] == \
+            datetime.date.today() - datetime.timedelta(days=1)
+
+    @requests_mock.mock()
     def test_add_npm_resource_processor_week_old_latest(self, mock_request):
         '''Latest in db for package is a week old, so fetch info from registry,
             and api.'''
@@ -143,7 +232,7 @@ class TestMeasureNPMProcessor(unittest.TestCase):
                         {'name': 'source', 'type': 'string'},
                     ]
                 }
-            }]  # nothing here
+            }]
         }
         params = {
             'name': 'hello',
@@ -225,7 +314,7 @@ class TestMeasureNPMProcessor(unittest.TestCase):
                         {'name': 'source', 'type': 'string'},
                     ]
                 }
-            }]  # nothing here
+            }]
         }
         params = {
             'name': 'hello',
