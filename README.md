@@ -66,7 +66,7 @@ config:
 
 Below is the specific configuration settings for each type of data source.
 
-### Code hosting
+### Code Hosting
 
 #### Github
 
@@ -84,6 +84,24 @@ config:
         - "frictionlessdata/datapackage-pipelines"
 ```
 
+
+### Code Packaging
+
+#### NPM
+
+The NPM processor collects data from the Node Package Manager (NPM) service where our Node and Javascript projects are hosted for distribution. The processor collects the number of daily `downloads` for each package listed in the `packages` section of the project configuration.
+
+```yaml
+config:
+  code-packaging:
+    npm:
+      packages:
+        - 'jsontableschema'
+        - 'goodtables'
+        - 'tableschema'
+```
+
+If no data has previously been collected for a particular package, the NPM processor will request daily data for all days since the beginning of the project.
 
 ### Social Media
 
