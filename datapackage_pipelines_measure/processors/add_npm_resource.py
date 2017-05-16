@@ -155,7 +155,7 @@ def process_resources(res_iter, datapackage, package):
         latest_date = None
         my_rows = []
         for row in first:
-            if row['package'] == package:
+            if row['package'] == package and row['source'] == 'npm':
                 latest_date = row['date']
             my_rows.append(row)
         return latest_date, iter(my_rows)
