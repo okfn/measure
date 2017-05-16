@@ -141,7 +141,7 @@ resource = {
     'name': slugify(package),
     'path': 'data/{}.csv'.format(slugify(package))
 }
-# Get the basic resource schema from the first row
+
 headers = ['package', 'source', 'date', 'downloads']
 resource['schema'] = {'fields': [{'name': h, 'type': 'string'}
                                  for h in headers]}
