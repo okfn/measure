@@ -18,6 +18,15 @@ config:
         - 'jsontableschema'
         - 'goodtables'
         - 'tableschema'
+    pypi:
+      packages:
+        - 'goodtables'
+        - 'tabulator'
+        - 'datapackage'
+        - 'jsontableschema'
+        - 'jsontableschema-sql'
+        - 'jsontableschema-bigquery'
+        - 'jsontableschema-pandas'
 
   code-hosting:
     github:

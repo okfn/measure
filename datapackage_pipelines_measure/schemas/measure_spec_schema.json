@@ -54,6 +54,15 @@
                 }
               },
               "required": ["packages"]
+            },
+            "pypi": {
+              "type": "object",
+              "properties": {
+                "packages": {
+                  "type": "array"
+                }
+              },
+              "required": ["packages"]
             }
           }
         }

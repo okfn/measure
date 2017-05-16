@@ -89,7 +89,7 @@ config:
 
 #### NPM
 
-The NPM processor collects data from the Node Package Manager (NPM) service where our Node and Javascript projects are hosted for distribution. The processor collects the number of daily `downloads` for each package listed in the `packages` section of the project configuration.
+The NPM processor collects data from the Node Package Manager (NPM) service where our Node and Javascript projects are hosted for distribution. The processor collects the number of daily `downloads` for each package listed in the `packages` section of the project configuration. What is meant by 'downloads' is discussed in this [blog post](http://blog.npmjs.org/post/92574016600/numeric-precision-matters-how-npm-download-counts).
 
 ```yaml
 config:
