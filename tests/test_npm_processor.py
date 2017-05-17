@@ -36,7 +36,7 @@ class TestMeasureNPMProcessor(unittest.TestCase):
             }
         }
         mock_api_responses = []
-        for day in reversed(range(1, day_range)):
+        for day in reversed(range(1, day_range+1)):
             start = now - datetime.timedelta(days=day)
             start = start.strftime("%Y-%m-%d")
             mock_api_responses.append({
@@ -85,16 +85,16 @@ class TestMeasureNPMProcessor(unittest.TestCase):
 
         # rows in resource
         rows = list(resources)[0]
-        assert len(rows) == 4
+        assert len(rows) == 5
         # row asserts
         assert rows[0] == {
-            'date': datetime.date.today() - datetime.timedelta(days=4),
-            'downloads': 4,
+            'date': datetime.date.today() - datetime.timedelta(days=5),
+            'downloads': 5,
             'package': 'my_package',
             'source': 'npm'
         }
-        assert rows[3]['downloads'] == 1
-        assert rows[3]['date'] == \
+        assert rows[len(rows)-1]['downloads'] == 1
+        assert rows[len(rows)-1]['date'] == \
             datetime.date.today() - datetime.timedelta(days=1)
 
     @requests_mock.mock()
@@ -112,7 +112,7 @@ class TestMeasureNPMProcessor(unittest.TestCase):
             }
         }
         mock_api_responses = []
-        for day in reversed(range(1, day_range)):
+        for day in reversed(range(1, day_range+1)):
             start = now - datetime.timedelta(days=day)
             start = start.strftime("%Y-%m-%d")
             mock_api_responses.append({
@@ -174,16 +174,16 @@ class TestMeasureNPMProcessor(unittest.TestCase):
 
         # rows in second resource
         rows = list(resources)[1]
-        assert len(rows) == 4
+        assert len(rows) == 5
         # row asserts
         assert rows[0] == {
-            'date': datetime.date.today() - datetime.timedelta(days=4),
-            'downloads': 4,
+            'date': datetime.date.today() - datetime.timedelta(days=5),
+            'downloads': 5,
             'package': 'my_package',
             'source': 'npm'
         }
-        assert rows[3]['downloads'] == 1
-        assert rows[3]['date'] == \
+        assert rows[len(rows)-1]['downloads'] == 1
+        assert rows[len(rows)-1]['date'] == \
             datetime.date.today() - datetime.timedelta(days=1)
 
     @requests_mock.mock()
@@ -201,7 +201,7 @@ class TestMeasureNPMProcessor(unittest.TestCase):
             }
         }
         mock_api_responses = []
-        for day in reversed(range(1, 7)):
+        for day in reversed(range(1, 8)):
             start = now - datetime.timedelta(days=day)
             start = start.strftime("%Y-%m-%d")
             mock_api_responses.append({
@@ -272,11 +272,11 @@ class TestMeasureNPMProcessor(unittest.TestCase):
 
         # second resource was added by add_npm_resource processor
         rows = resources[1]
-        assert len(rows) == 6
+        assert len(rows) == 7
         # row asserts
         assert rows[0] == {
-            'date': datetime.date.today() - datetime.timedelta(days=6),
-            'downloads': 6,
+            'date': datetime.date.today() - datetime.timedelta(days=7),
+            'downloads': 7,
             'package': 'my_package',
             'source': 'npm'
         }

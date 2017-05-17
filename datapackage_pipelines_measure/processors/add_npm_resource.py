@@ -50,7 +50,7 @@ def _get_requested_period_date_range(package, latest_date=None):
     '''Determine and return the required start_date and end_date for given
     package'''
     start_date = _get_start_date(package, latest_date)
-    end_date = datetime.date.today() - datetime.timedelta(days=1)
+    end_date = datetime.date.today()
     return start_date, end_date
 
 
