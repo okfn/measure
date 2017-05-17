@@ -21,7 +21,8 @@ INSTALL_REQUIRES = [
     'datapackage-pipelines',
     'psycopg2',
     'tweepy',
-    'facebook-sdk'
+    'facebook-sdk',
+    'google-api-python-client==1.5.3',
 ]
 TESTS_REQUIRE = [
     'pylama',
