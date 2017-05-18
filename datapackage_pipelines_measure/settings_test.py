@@ -32,5 +32,5 @@ WGLsbBd77mVPGIuL0XGrvbVYPE8yIcNbZcthd8VXL/38Ygy8SIZh2ZqsrU1b5WFa
 XUMLnGEODSS8x/GmW3i3KeirW5OxBNjfUzEF4XkJP8m41iTdsQEXQf9DdUY7X+CB
 VL5h7N0VstYhGgycuPpcIUQa
 -----END PRIVATE KEY-----""")
-except Exception as e:
-    raise e
+except KeyError:
+    pass
