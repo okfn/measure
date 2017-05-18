@@ -7,10 +7,6 @@ try:
 except ImportError:
     pass
 
-# Some ENV VARS need to be added here, if we're testing (ENV VARS that tox.ini
-# can't handle).
-from .settings_test import * # noqa
-
 
 NAMESPACE = 'MEASURE_'
 

@@ -28,6 +28,10 @@ def get_google_api_service(service_name, service_version, scopes):
         jwt_dict = {key.replace(JWT_NAMESPACE, '').lower(): settings[key]
                     for key in settings
                     if key.startswith(JWT_NAMESPACE)}
+        # Handle newlines in private key
+        if 'private_key' in jwt_dict:
+            jwt_dict['private_key'] = \
+                jwt_dict['private_key'].replace('\\n', '\n')
         jwt_dict['PROJECT_ID'] = settings['GOOGLE_API_PROJECT_ID']
         return jwt_dict
 
