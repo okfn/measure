@@ -103,6 +103,34 @@ config:
 
 If no data has previously been collected for a particular package, the NPM processor will request daily data for all days since the beginning of the project.
 
+#### PyPI
+
+The PyPI processor collects data from the Python Package Index (PyPI) where our Python projects are hosted for distribution. The processor collects the number of daily `downloads` for each package listed in the `packages` section of the project configuration.
+
+```yaml
+config:
+  code-packaging:
+    pypi:
+      packages:
+        - 'jsontableschema'
+        - 'goodtables'
+        - 'tableschema'        
+```
+
+If no data has previously been collected for a particular package, the processor will requests daily data from the start date of PyPI's BigQuery database (2016-01-22).
+
+##### PyPI Configuration
+
+The PyPI processor requires a Google API account with generated credential to make BigQuery queries.
+
+1. **Go** to your [Google Cloud Platform Console](https://console.cloud.google.com)
+1. **Pick** or **Create the Project** you want
+1. **Use Google API**, **Enable API**, search for **Big Query API**, click **ENABLE**
+1. Click **Go To Credentials**, there choose **Service Account** Credentials
+1. Click on **Options** symbol for **App Engine default service account**, click **Create Key**
+1. Choose Key Type to be **JSON**
+1. The downloaded file will have all the credentials you need. Keep them safe, and use them to [populate the environmental variables below](#pypi-1).
+
 ### Social Media
 
 #### Twitter
@@ -209,3 +237,17 @@ Each installation of Measure requires certain environmental variables to be set.
 
 #### Facebook
 - `MEASURE_FACEBOOK_API_ACCESS_TOKEN_{PAGE NAME IN UPPERCASE}`: The page access token obtained from [How to get a Facebook Page Access Token](#how-to-get-a-facebook-page-access-token).
+
+#### PyPI
+See the [PyPI Big Query API](#pypi-configuration) instructions above to get the values for these env vars:
+- `MEASURE_GOOGLE_API_PROJECT_ID`: {project_id}
+- `MEASURE_GOOGLE_API_JWT_AUTH_PROVIDER_X509_CERT_URL`: {auth_provider_x509_cert_url}
+- `MEASURE_GOOGLE_API_JWT_AUTH_URI`: {auth_uri}
+- `MEASURE_GOOGLE_API_JWT_CLIENT_EMAIL`: {client_email}
+- `MEASURE_GOOGLE_API_JWT_CLIENT_ID`: {client_id}
+- `MEASURE_GOOGLE_API_JWT_CLIENT_X509_CERT_URL`: {client_x509_cert_url}
+- `MEASURE_GOOGLE_API_JWT_PRIVATE_KEY`: {private_key}
+- `MEASURE_GOOGLE_API_JWT_PRIVATE_KEY_ID`: {private_key_id}
+- `MEASURE_GOOGLE_API_JWT_TOKEN_URI`: {token_uri}
+- `MEASURE_GOOGLE_API_JWT_TYPE`: {type}
+

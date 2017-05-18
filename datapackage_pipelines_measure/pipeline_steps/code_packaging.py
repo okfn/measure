@@ -19,19 +19,25 @@ def add_steps(steps: list, pipeline_id: str,
         'distinct_on': ['project_id', 'package', 'source']
     }))
 
-    for package in config['npm']['packages']:
-        steps.append(('measure.add_npm_resource', {
-            'package': slugify(package),
-            'project_id': project_id
-        }))
+    if 'npm' in config:
+        for package in config['npm']['packages']:
+            steps.append(('measure.add_npm_resource', {
+                'package': slugify(package),
+                'project_id': project_id
+            }))
+
+    if 'pypi' in config:
+        for package in config['pypi']['packages']:
+            steps.append(('measure.add_pypi_resource', {
+                'package': slugify(package),
+                'project_id': project_id
+            }))
 
     steps.append(('measure.remove_resource', {
         'name': 'latest-project-entries'
     }))
 
     steps.append(('concatenate', {
-        'sources':
-            [slugify(package) for package in config['npm']['packages']],
         'target': {
             'name': 'code-packaging',
             'path': 'data/code-packaging.csv'},
