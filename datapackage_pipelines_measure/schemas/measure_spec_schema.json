@@ -65,6 +65,29 @@
               "required": ["packages"]
             }
           }
+        },
+        "website-analytics": {
+          "type": "object",
+          "properties": {
+            "ga": {
+              "type": "object",
+              "properties": {
+                "domains": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "url": {"type": "string"},
+                      "viewid": {"type": ["string", "integer"]}
+                    },
+                    "required": ["url", "viewid"]
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": ["domains"]
+            }
+          }
         }
       }
     }
