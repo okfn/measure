@@ -214,31 +214,66 @@ Each page listed in the project config file will require a Facebook Page Access 
     - Each page must have its own env var to store its token. e.g. for the OKFNetwork page:
     `MEASURE_FACEBOOK_API_ACCESS_TOKEN_OKFNETWORK='{the OKFNetwork page token obtained above}'`
 
-## Installation
+### Website Analytics
 
-### Environmental Variables
+#### Google Analytics
+
+The Google Analytics processor collects visitor data for specified domain. For each domain the following is collected:
+
+- **visitors**: The total number of visits to the domain each day. In GA terms, this is the number of sessions.
+- **unique_visitors**: The total number of unique visitors who made at least one visit to the domain that day. In GA terms, this is the number of users.
+- **avg_time_spent**: The average session duration in seconds. In GA terms, this is Avg. Session Duration.
+
+Domains are specified in the project configuration and require the domain `url` and Google Analytics `viewid`.
+
+```yaml
+config:
+  website-analytics:
+    ga:
+      domains:
+        - url: 'frictionlessdata.io'
+          viewid: '120195554'
+        - url: 'specs.frictionlessdata.io'
+          viewid: '57520245'
+```
+
+Each `viewid` can be found within your Google Analytics account. See [this short video for guidance](https://www.youtube.com/watch?v=x1MljgyLeRM).
+
+##### Google Analytics Configuration
+
+The Google Analytics processor requires a Google API account with the **Google Analytics Reporting API** enabled.
+
+1. Enable Google Analytics Reporting API:
+    - Go to your [Google Cloud Platform Console](https://console.cloud.google.com/)
+    - Pick the project you are using
+    - Go to **API Manager/Dashboard**
+    - Click on **Enable API**, search for **Google Analytics Reporting API**, click **ENABLE**
+1. Give Measure credentials to the websites' analytics you'd like to track:
+    - Add the service account email to the list of users that has read permissions in the given analytics' accounts
+
+## Environmental Variables
 
 Each installation of Measure requires certain environmental variables to be set.
 
-#### General
+### General
 
 - `MEASURE_DB_ENGINE`: Location of SQL database as a URL Schema
 - `MEASURE_TIMESTAMP_DEFAULT_FORMAT`: datetime format used for `timestamp` value. Currently must be `%Y-%m-%dT%H:%M:%SZ`.
 
-#### Github
+### Github
 
 - `MEASURE_GITHUB_API_BASE_URL`: Github API base url (`https://api.github.com/repos/`)
 - `MEASURE_GITHUB_API_TOKEN`: Github API token used for making requests
 
-#### Twitter
+### Twitter
 
 - `MEASURE_TWITTER_API_CONSUMER_KEY`: Twitter app API consumer key
 - `MEASURE_TWITTER_API_CONSUMER_SECRET`: Twitter app API consumer secret
 
-#### Facebook
+### Facebook
 - `MEASURE_FACEBOOK_API_ACCESS_TOKEN_{PAGE NAME IN UPPERCASE}`: The page access token obtained from [How to get a Facebook Page Access Token](#how-to-get-a-facebook-page-access-token).
 
-#### PyPI
+### PyPI & Google analytics
 See the [PyPI Big Query API](#pypi-configuration) instructions above to get the values for these env vars:
 - `MEASURE_GOOGLE_API_PROJECT_ID`: {project_id}
 - `MEASURE_GOOGLE_API_JWT_AUTH_PROVIDER_X509_CERT_URL`: {auth_provider_x509_cert_url}

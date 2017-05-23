@@ -51,3 +51,11 @@ config:
         - "frictionlessdata/datapackage-r"
         - "frictionlessdata/datapackagist"
         - "frictionlessdata/goodtables-js"
+
+  website-analytics:
+    ga:
+      domains:
+        - url: 'frictionlessdata.io'
+          viewid: '120195554'
+        - url: 'specs.frictionlessdata.io'
+          viewid: '57520245'

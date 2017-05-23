@@ -11,6 +11,11 @@ GOOGLE_API_BIGQUERY_VERSION = 'v2'
 GOOGLE_API_BIGQUERY_SERVICE_NAME = 'bigquery'
 GOOGLE_API_BIGQUERY_SCOPES = \
     'https://www.googleapis.com/auth/bigquery'
+
+GOOGLE_API_GA_SERVICE_NAME = 'analyticsreporting'
+GOOGLE_API_GA_VERSION = 'v4'
+GOOGLE_API_GA_SCOPES = 'https://www.googleapis.com/auth/analytics.readonly'
+
 JWT_NAMESPACE = 'GOOGLE_API_JWT_'
 
 
