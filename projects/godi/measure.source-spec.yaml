@@ -5,7 +5,7 @@ config:
   social-media:
     twitter:
       entities:
-        - "#GODI16"
+        - "#godi16"
 
   code-hosting:
     github:
