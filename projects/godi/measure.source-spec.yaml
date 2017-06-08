@@ -1,0 +1,19 @@
+project: godi
+
+config:
+
+  social-media:
+    twitter:
+      entities:
+        - "#GODI16"
+
+  code-hosting:
+    github:
+      repositories:
+        - "okfn/opendatasurvey"
+
+  website-analytics:
+    ga:
+      domains:
+        - url: 'index.okfn.org'
+          viewid: '78164875'
