@@ -6,6 +6,7 @@ config:
     twitter:
       entities:
         - "#godi16"
+        - "url:index.okfn.org"
 
   code-hosting:
     github:

@@ -15,7 +15,8 @@ log = logging.getLogger(__name__)
 
 tweepy_cursor = tweepy.Cursor
 
-ENTITY_VALUE_ERROR_MSG = 'Entity, "{}", must be an @account or a #hashtag'
+ENTITY_VALUE_ERROR_MSG = 'Entity, "{}", must be an @account, #hashtag, ' \
+                         'or url:url-search'
 TWITTER_API_USER_NOT_FOUND_ERROR_CODE = "50"
 TWITTER_API_DATE_RANGE_FORMAT = '%Y-%m-%d'
 TWITTER_API_PER_PAGE_LIMIT = 100
@@ -30,6 +31,8 @@ def _get_entity_type(entity):
         return 'account'
     elif entity.startswith('#'):
         return 'hashtag'
+    elif entity.startswith('url:'):
+        return 'url'
     else:
         raise ValueError(ENTITY_VALUE_ERROR_MSG.format(entity))
 
@@ -40,6 +43,8 @@ def _get_safe_entity(entity):
         return 'at-{}'.format(slugify(entity))
     elif entity.startswith('#'):
         return 'hash-{}'.format(slugify(entity))
+    elif entity.startswith('url:'):
+        return slugify(entity)
     else:
         raise ValueError(ENTITY_VALUE_ERROR_MSG.format(entity))
 
@@ -169,10 +174,10 @@ def _get_interactions_for_entity_from_source(entity, start_date, end_date):
         measured 'interaction' metrics - favorites and retweets.
         '''
         tweets = _get_account_tweets(entity, start_date, end_date)
-    elif entity_type == 'hashtag':
+    elif entity_type == 'hashtag' or entity_type == 'url':
         '''
-        Get interactions for a hashtag entity. This is done by searching for
-        the hashtag between the given date range, and aggregate the measured
+        Get interactions for a hashtag or url entity. This is done by searching
+        for the entity between the given date range, and aggregate the measured
         'interaction' metrics - favorites and retweets.
         '''
         tweets = _get_twitter_search_results(entity, start_date, end_date)

@@ -198,6 +198,77 @@ class TestMeasureTwitterProcessor(unittest.TestCase):
                 'date': datetime.date.today() - datetime.timedelta(days=1)
             }
 
+    @mock.patch('tweepy.Cursor')
+    @mock.patch('tweepy.auth.AppAuthHandler')
+    @mock.patch('tweepy.API')
+    def test_add_twitter_resource_processor_url(self, mock_api,
+                                                mock_auth, mock_cursor):
+        '''Test twitter processor handles url entities (url:<term>).'''
+        # mock the twitter api response
+        mock_auth.return_value = 'authed'
+        mock_api.return_value = my_mock_api
+        yesterday = \
+            datetime.datetime.now() - datetime.timedelta(days=1)
+        yesterdays_statuses = [
+            Status('okfnlabs', 1, 5, yesterday),
+            Status('anonymous', 3, 0, yesterday),
+            Status('anonymous', 3, 8, yesterday)
+        ]
+        mock_cursor.return_value.items.side_effect = [
+            get_cursor_items_iter(yesterdays_statuses)
+        ]
+
+        # input arguments used by our mock `ingest`
+        datapackage = {
+            'name': 'my-datapackage',
+            'project': 'my-project',
+            'resources': []
+        }
+        params = {
+            'entity': 'url:example.com',
+            'project_id': 'my-project'
+        }
+
+        # Path to the processor we want to test
+        processor_dir = \
+            os.path.dirname(datapackage_pipelines_measure.processors.__file__)
+        processor_path = os.path.join(processor_dir, 'add_twitter_resource.py')
+
+        # Trigger the processor with our mock `ingest` and capture what it will
+        # returned to `spew`.
+        spew_args, _ = \
+            mock_processor_test(processor_path,
+                                (params, datapackage, []))
+
+        spew_dp = spew_args[0]
+        spew_res_iter = spew_args[1]
+
+        # Asserts for the datapackage
+        dp_resources = spew_dp['resources']
+        assert len(dp_resources) == 1
+        assert dp_resources[0]['name'] == 'url-example-com'
+        field_names = \
+            [field['name'] for field in dp_resources[0]['schema']['fields']]
+        assert field_names == ['entity', 'entity_type',
+                               'source', 'date', 'mentions',
+                               'interactions', 'followers']
+
+        # Asserts for the res_iter
+        spew_res_iter_contents = list(spew_res_iter)
+        assert len(spew_res_iter_contents[0]) == 1
+
+        first_row = spew_res_iter_contents[0][0]
+        assert first_row == \
+            {
+                'entity': 'url:example.com',
+                'entity_type': 'url',
+                'source': 'twitter',
+                'followers': None,
+                'mentions': 3,
+                'interactions': 20,
+                'date': datetime.date.today() - datetime.timedelta(days=1)
+            }
+
     @mock.patch('tweepy.auth.AppAuthHandler')
     @mock.patch('tweepy.API')
     def test_add_twitter_resource_processor_nonentity(self, mock_api,
