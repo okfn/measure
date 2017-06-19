@@ -135,13 +135,21 @@ The PyPI processor requires a Google API account with generated credential to ma
 
 #### Twitter
 
-The Twitter processor collects data about each entity listed in the `entities` section. Entities can be either a twitter hashtag (starting with `#`) or an account name (starting with a `@`). For each entity, the processor collects:
+The Twitter processor collects data about each entity listed in the `entities` section. Entities can be one of the following:
+
+- `#hashtag`: a twitter hash tag
+- `@account`: an account name
+- `url:search-term`: a search term as part of a url
+
+For each entity, the processor collects:
 
 - **mentions**: total of tweets mentioning the entity for the period (day)
 - **interactions**: total of 'favorites' and 'retweets' for tweets mentioning the hashtag, or tweets authored by the account, for the period (day).
 
 And additionally, for account entities:
 - the current number of **followers**
+
+Url search terms are used to find urls mentioned in tweets. It is best to leave off `http://` prefixes. Urls searches for just the domain will be less specific (will return more results) than for url searches that include a path, e.g.: `url:blog.okfn.org` will return more results than the more specific search, `url:blog.okfn.org/2017/`, which in turn will return more results than `url:blog.okfn.org/2017/06/15/the-final-global-open-data-index-is-now-live/`.
 
 ```yaml
 config:
@@ -151,6 +159,7 @@ config:
         - "#frictionlessdata"
         - "#datapackages"
         - "@okfnlabs"
+        - "url:frictionlessdata.io"
 ```
 
 

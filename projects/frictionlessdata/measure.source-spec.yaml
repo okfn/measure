@@ -8,6 +8,7 @@ config:
         - "#frictionlessdata"
         - "#datapackages"
         - "@okfnlabs"
+        - "url:frictionlessdata.io"
     facebook:
       pages:
         - "OKFNetwork"
