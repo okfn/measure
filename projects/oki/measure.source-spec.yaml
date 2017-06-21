@@ -1,0 +1,26 @@
+project: oki
+
+config:
+
+  social-media:
+    twitter:
+      entities:
+        - "@okfn"
+        - "url:blog.okfn.org"
+        - "url:okfn.org"
+    facebook:
+      pages:
+        - "OKFNetwork"
+
+  code-hosting:
+    github:
+      repositories:
+        - "okfn/website"
+
+  website-analytics:
+    ga:
+      domains:
+        - url: 'okfn.org'
+          viewid: '16659410'
+        - url: 'blog.okfn.org'
+          viewid: '16660544'
