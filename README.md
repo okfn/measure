@@ -190,6 +190,7 @@ Each page listed in the project config file will require a Facebook Page Access 
     - Add the User that sets the token as an **Analyst** or above
  
 2. Create a Facebook App:
+    - Note: If you already a Facebook App for an existing Measure project, you can reuse it and skip this step
     - Go to [Facebook Developers](https://developers.facebook.com/)
     - On the upper right menu, select **My Apps** select **Add a New App**
     - Fill in the details, app name and email address, and and click **Create App ID**
