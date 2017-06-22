@@ -22,15 +22,13 @@ def add_steps(steps: list, pipeline_id: str,
     if 'npm' in config:
         for package in config['npm']['packages']:
             steps.append(('measure.add_npm_resource', {
-                'package': slugify(package),
-                'project_id': project_id
+                'package': slugify(package)
             }))
 
     if 'pypi' in config:
         for package in config['pypi']['packages']:
             steps.append(('measure.add_pypi_resource', {
-                'package': slugify(package),
-                'project_id': project_id
+                'package': slugify(package)
             }))
 
     steps.append(('measure.remove_resource', {
