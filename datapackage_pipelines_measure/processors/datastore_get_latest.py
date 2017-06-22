@@ -16,6 +16,7 @@ table = parameters['table']
 engine = parameters['engine']
 resource_name = parameters['resource-name']
 distinct_on = ', '.join(parameters['distinct_on'])
+sort_date_key = parameters.get('sort_date_key', 'date')
 
 Base = automap_base()
 engine = create_engine(engine)
@@ -33,7 +34,8 @@ else:
     s = text(
         "SELECT DISTINCT ON ({0}) *"
         "FROM {1} "
-        "ORDER BY {0}, date DESC".format(distinct_on, table)
+        "ORDER BY {0}, {2} DESC"
+        .format(distinct_on, table, sort_date_key)
     )
 
     results = session.query(Table).from_statement(s).all()
