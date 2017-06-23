@@ -88,6 +88,19 @@
               "required": ["domains"]
             }
           }
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sheetid": {"type": "string"},
+              "gid": {"type": "string"},
+              "type": {"type": "string"}
+            },
+            "required": ["sheetid", "gid", "type"]
+          },
+          "minItems": 1
         }
       }
     }
