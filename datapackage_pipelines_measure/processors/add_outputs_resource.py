@@ -69,7 +69,12 @@ def form_collector(source_id, source_type, latest_date):
         row = r['c']
         row_dict = {}
         for i, v in enumerate(row):
-            row_dict[headers[i]] = v.get('f') or v.get('v')
+            if v is not None:
+                row_dict[headers[i]] = v.get('f') or v.get('v')
+            else:
+                row_dict[headers[i]] = None
+        output_date = dateutil.parser.parse(row_dict.get('date')).date() \
+            if row_dict.get('date') is not None else None
         res_row = {
             'source_id': source_id,
             'source_type': source_type,
@@ -82,7 +87,7 @@ def form_collector(source_id, source_type, latest_date):
             'output_organization': row_dict.get('for-what-organisation'),
             'output_person': row_dict.get('who-did-this'),
             'output_link': row_dict.get('link-if-published'),
-            'output_date': dateutil.parser.parse(row_dict.get('date')).date()
+            'output_date': output_date
         }
         resource_content.append(res_row)
 
