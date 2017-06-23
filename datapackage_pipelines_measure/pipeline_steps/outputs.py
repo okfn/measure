@@ -21,14 +21,12 @@ def add_steps(steps: list, pipeline_id: str,
         'sort_date_key': 'source_timestamp'
     }))
 
-    if 'internal' in config:
-        for internal in config['internal']:
-            sheet_id = internal.get('sheetid')
-            gid = internal.get('gid')
-            steps.append(('measure.add_outputs_resource', {
-                'sheet_id': sheet_id,
-                'gid': gid
-            }))
+    for source in config:
+        steps.append(('measure.add_outputs_resource', {
+            'sheet_id': source.get('sheetid'),
+            'gid': source.get('gid'),
+            'source_type': source.get('type')
+        }))
 
     steps.append(('measure.remove_resource', {
         'name': 'latest-project-entries'
@@ -40,6 +38,7 @@ def add_steps(steps: list, pipeline_id: str,
             'path': 'data/outputs.csv'},
         'fields': {
             'source_id': [],
+            'source_type': [],
             'source': [],
             'source_timestamp': [],
             'source_email': [],
@@ -54,6 +53,9 @@ def add_steps(steps: list, pipeline_id: str,
     steps.append(('set_types', {
         'types': {
             'source_id': {
+                'type': 'string'
+            },
+            'source_type': {
                 'type': 'string'
             },
             'source': {

@@ -55,8 +55,7 @@ def _request_data_from_google_spreadsheet(start_date):
     return response
 
 
-def form_collector(source_id, latest_date):
-
+def form_collector(source_id, source_type, latest_date):
     start_date = FAR_PAST_START_DATE
     if latest_date:
         start_date = latest_date.date()
@@ -73,6 +72,7 @@ def form_collector(source_id, latest_date):
             row_dict[headers[i]] = v.get('f') or v.get('v')
         res_row = {
             'source_id': source_id,
+            'source_type': source_type,
             'source': 'gsheets',
             'source_timestamp':
                 dateutil.parser.parse(row_dict.get('timestamp')),
@@ -89,7 +89,7 @@ def form_collector(source_id, latest_date):
     return resource_content
 
 
-def process_resources(res_iter, datapackage, source_id):
+def process_resources(res_iter, datapackage, source_id, source_type):
 
     def get_latest_date(first):
         latest_date = None
@@ -107,25 +107,27 @@ def process_resources(res_iter, datapackage, source_id):
         else:
             latest_date = None
     yield from res_iter
-    yield form_collector(source_id, latest_date)
+    yield form_collector(source_id, source_type, latest_date)
 
 
 parameters, datapackage, res_iter = ingest()
 
 sheet_id = parameters['sheet_id']
 gid = parameters['gid']
+source_type = parameters['source_type']
 source_id = '{0}/{1}'.format(sheet_id, gid)
 resource = {
     'name': slugify(sheet_id).lower(),
     'path': 'data/{}.csv'.format(slugify(sheet_id))
 }
 
-headers = ['source', 'source_timestamp', 'source_email', 'output_title',
-           'output_type', 'output_organization', 'output_person',
-           'output_link', 'output_date']
+headers = ['source', 'source_type', 'source_timestamp', 'source_email',
+           'output_title', 'output_type', 'output_organization',
+           'output_person', 'output_link', 'output_date']
 resource['schema'] = {'fields': [{'name': h, 'type': 'string'}
                                  for h in headers]}
 
 datapackage['resources'].append(resource)
 
-spew(datapackage, process_resources(res_iter, datapackage, source_id))
+spew(datapackage, process_resources(res_iter, datapackage,
+                                    source_id, source_type))

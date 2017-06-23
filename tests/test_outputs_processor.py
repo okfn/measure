@@ -32,7 +32,8 @@ class TestMeasureOutputsProcessor(unittest.TestCase):
         }
         params = {
             'sheet_id': 'mysheetsid',
-            'gid': 'mygid'
+            'gid': 'mygid',
+            'source_type': 'internal'
         }
 
         # Path to the processor we want to test
@@ -66,7 +67,8 @@ class TestMeasureOutputsProcessor(unittest.TestCase):
             'source_email': 'example@example.com',
             'source_id': 'mysheetsid/mygid',
             'source_timestamp': datetime.datetime(2017, 6, 20, 11, 10, 53),
-            'source': 'gsheets'
+            'source': 'gsheets',
+            'source_type': 'internal'
         }
         # last row asserts
         assert rows[len(rows)-1] == {
@@ -79,7 +81,8 @@ class TestMeasureOutputsProcessor(unittest.TestCase):
             'source_email': 'example@example.com',
             'source_id': 'mysheetsid/mygid',
             'source_timestamp': datetime.datetime(2017, 6, 22, 8, 11, 24),
-            'source': 'gsheets'
+            'source': 'gsheets',
+            'source_type': 'internal'
         }
 
     @mock.patch('datapackage_pipelines_measure.processors.google_utils.get_authorized_http_object') # noqa
@@ -115,7 +118,8 @@ class TestMeasureOutputsProcessor(unittest.TestCase):
         }
         params = {
             'sheet_id': 'mysheetsid',
-            'gid': 'mygid'
+            'gid': 'mygid',
+            'source_type': 'internal'
         }
 
         now = datetime.datetime.now()
@@ -131,7 +135,8 @@ class TestMeasureOutputsProcessor(unittest.TestCase):
                     'source_email': 'example@example.com',
                     'source_id': 'mysheetsid/mygid',
                     'source_timestamp': now - datetime.timedelta(days=5),
-                    'source': 'gsheets'
+                    'source': 'gsheets',
+                    'source_type': 'internal'
                 }
 
         # Path to the processor we want to test
@@ -169,7 +174,8 @@ class TestMeasureOutputsProcessor(unittest.TestCase):
             'source_email': 'example@example.com',
             'source_id': 'mysheetsid/mygid',
             'source_timestamp': datetime.datetime(2017, 6, 20, 11, 10, 53),
-            'source': 'gsheets'
+            'source': 'gsheets',
+            'source_type': 'internal'
         }
         # last row asserts
         assert rows[len(rows)-1] == {
@@ -182,7 +188,8 @@ class TestMeasureOutputsProcessor(unittest.TestCase):
             'source_email': 'example@example.com',
             'source_id': 'mysheetsid/mygid',
             'source_timestamp': datetime.datetime(2017, 6, 22, 8, 11, 24),
-            'source': 'gsheets'
+            'source': 'gsheets',
+            'source_type': 'internal'
         }
 
     @mock.patch('datapackage_pipelines_measure.processors.google_utils.get_authorized_http_object') # noqa
@@ -203,7 +210,8 @@ class TestMeasureOutputsProcessor(unittest.TestCase):
         }
         params = {
             'sheet_id': 'mysheetsid',
-            'gid': 'mygid'
+            'gid': 'mygid',
+            'source_type': 'internal'
         }
 
         # Path to the processor we want to test
@@ -247,7 +255,8 @@ class TestMeasureOutputsProcessor(unittest.TestCase):
         }
         params = {
             'sheet_id': 'mysheetsid',
-            'gid': 'mygid'
+            'gid': 'mygid',
+            'source_type': 'internal'
         }
 
         # Path to the processor we want to test
