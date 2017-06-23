@@ -6,15 +6,18 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 from datapackage_pipelines_measure.config import settings
 
-GOOGLE_API_BIGQUERY_DEFAULT_TIMEOUT_MILLISECONDS = 60000
-GOOGLE_API_BIGQUERY_VERSION = 'v2'
 GOOGLE_API_BIGQUERY_SERVICE_NAME = 'bigquery'
-GOOGLE_API_BIGQUERY_SCOPES = \
-    'https://www.googleapis.com/auth/bigquery'
+GOOGLE_API_BIGQUERY_VERSION = 'v2'
+GOOGLE_API_BIGQUERY_SCOPES = 'https://www.googleapis.com/auth/bigquery'
+GOOGLE_API_BIGQUERY_DEFAULT_TIMEOUT_MILLISECONDS = 60000
 
 GOOGLE_API_GA_SERVICE_NAME = 'analyticsreporting'
 GOOGLE_API_GA_VERSION = 'v4'
 GOOGLE_API_GA_SCOPES = 'https://www.googleapis.com/auth/analytics.readonly'
+
+GOOGLE_API_DRIVE_SERVICE_NAME = 'drive'
+GOOGLE_API_DRIVE_VERSION = 'v3'
+GOOGLE_API_DRIVE_SCOPES = 'https://www.googleapis.com/auth/drive.readonly'
 
 JWT_NAMESPACE = 'GOOGLE_API_JWT_'
 
