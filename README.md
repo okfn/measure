@@ -269,7 +269,17 @@ We capture these outputs manually using Google Forms, which writes the results t
 
 #### Outputs Captured by Google Forms
 
-The Outputs processor requires a Google API account with generated credentials to read private Google Spreadsheet URLs.
+The Outputs processor requires a Google API account with generated credentials to read private Google Spreadsheet URLs. This is an explanation of what is collected by the processor:
+
+- **source_id**: The id of the source spreadsheet in the form: `{sheetid}/{gid}`
+- **source_type**: The purpose for the Outputs Form, e.g 'internal' or 'external'
+- **source_email**: The email address of the person who filled out the form
+- **output_title**: The title of the output instance. This could be an article title, talk title, or other short description
+- **output_type**: The type of output selected by the user, e.g. 'Talk given', or 'Labs hang out'
+- **output_organization**: The organization targeted by the output
+- **output_person**: Who create/delivered the output
+- **output_link**: Link to the output, if appropriate
+- **output_date**: Date the output was published/delivered
 
 1. Make a copy of the Outputs Form template for your project (https://docs.google.com/a/okfn.org/forms/d/e/1FAIpQLSfQuBlwZMnWhGjCv4teAMdsKQ3pgbAi08ZwKBtZLAQFw7LqDg/viewform)
 2. Configure the associated spreadsheet destination where captured data will be written to. This can be found within the 'Responses' tab for the
