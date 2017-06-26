@@ -261,6 +261,47 @@ The Google Analytics processor requires a Google API account with the **Google A
 1. Give Measure credentials to the websites' analytics you'd like to track:
     - Add the service account email to the list of users that has read permissions in the given analytics' accounts
 
+### Outputs
+
+'Outputs' refers to secondary events and products related to a project, e.g. blog posts, talks given, or tangible uses of our products. These can be either internally produced, or external.
+
+We capture these outputs manually using Google Forms, which writes the results to a Google Spreadsheet.
+
+#### Outputs Captured by Google Forms
+
+The Outputs processor requires a Google API account with generated credentials to read private Google Spreadsheet URLs. This is an explanation of what is collected by the processor:
+
+- **source_id**: The id of the source spreadsheet in the form: `{sheetid}/{gid}`
+- **source_type**: The purpose for the Outputs Form, e.g 'internal' or 'external'
+- **source_email**: The email address of the person who filled out the form
+- **output_title**: The title of the output instance. This could be an article title, talk title, or other short description
+- **output_type**: The type of output selected by the user, e.g. 'Talk given', or 'Labs hang out'
+- **output_organization**: The organization targeted by the output
+- **output_person**: Who create/delivered the output
+- **output_link**: Link to the output, if appropriate
+- **output_date**: Date the output was published/delivered
+
+1. Make a copy of the Outputs Form template for your project (https://docs.google.com/a/okfn.org/forms/d/e/1FAIpQLSfQuBlwZMnWhGjCv4teAMdsKQ3pgbAi08ZwKBtZLAQFw7LqDg/viewform)
+2. Configure the associated spreadsheet destination where captured data will be written to. This can be found within the 'Responses' tab for the form, within the settings dropdown > 'Select response destination'
+3. Go to the form's spreadsheet and make a note of the `sheetid` and `gid`, which are part of the spreadsheet URL:
+```https://docs.google.com/spreadsheets/d/{sheetid}/edit#gid={gid}```
+4. Ensure the spreadsheet can be read by the Google API service account that is being used to authorise requests, either by making the spreadsheet public, or by sharing it with the email associated with the service account (defined in the generated credentials)
+5. Configure the Measure project with an entry for the Outputs processor:
+
+```yaml
+# sheetid and gid correspond with the parts of the spreadsheet url:
+# https://docs.google.com/spreadsheets/d/{sheetid}/edit#gid={gid}
+
+config:
+  outputs:
+    - sheetid: "{sheetid from above}"
+      gid: "{gid from above}"
+      type: "external"  # the type of outputs captured here
+    - sheetid: "{another sheetid}"
+      gid: "{another gid}"
+      type: "internal"
+```
+
 ## Environmental Variables
 
 Each installation of Measure requires certain environmental variables to be set.
@@ -283,7 +324,7 @@ Each installation of Measure requires certain environmental variables to be set.
 ### Facebook
 - `MEASURE_FACEBOOK_API_ACCESS_TOKEN_{PAGE NAME IN UPPERCASE}`: The page access token obtained from [How to get a Facebook Page Access Token](#how-to-get-a-facebook-page-access-token).
 
-### PyPI & Google analytics
+### Google credentials for PyPI, Google analytics, and Outputs
 See the [PyPI Big Query API](#pypi-configuration) instructions above to get the values for these env vars:
 - `MEASURE_GOOGLE_API_PROJECT_ID`: {project_id}
 - `MEASURE_GOOGLE_API_JWT_AUTH_PROVIDER_X509_CERT_URL`: {auth_provider_x509_cert_url}

@@ -116,7 +116,6 @@ def pypi_collector(package, latest_date):
 parameters, datapackage, res_iter = ingest()
 
 package = parameters['package']
-project_id = parameters['project_id']
 resource = {
     'name': slugify(package),
     'path': 'data/{}.csv'.format(slugify(package))

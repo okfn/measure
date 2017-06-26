@@ -174,7 +174,7 @@ class TestMeasureGAProcessor(unittest.TestCase):
         # spew_dp = spew_args[0]
         spew_res_iter = spew_args[1]
 
-        # one resource
+        # two resources
         resources = list(spew_res_iter)
         assert len(resources) == 2
 
