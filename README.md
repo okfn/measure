@@ -282,11 +282,10 @@ The Outputs processor requires a Google API account with generated credentials t
 - **output_date**: Date the output was published/delivered
 
 1. Make a copy of the Outputs Form template for your project (https://docs.google.com/a/okfn.org/forms/d/e/1FAIpQLSfQuBlwZMnWhGjCv4teAMdsKQ3pgbAi08ZwKBtZLAQFw7LqDg/viewform)
-2. Configure the associated spreadsheet destination where captured data will be written to. This can be found within the 'Responses' tab for the
-3.  form, within the settings dropdown > 'Select response destination'
+2. Configure the associated spreadsheet destination where captured data will be written to. This can be found within the 'Responses' tab for the form, within the settings dropdown > 'Select response destination'
 3. Go to the form's spreadsheet and make a note of the `sheetid` and `gid`, which are part of the spreadsheet URL:
 ```https://docs.google.com/spreadsheets/d/{sheetid}/edit#gid={gid}```
-4. Ensure the spreadsheet can be read by the Google API service account that is being used to authorise requests. Either by making the spreadsheet public, or by sharing with the email associated with the service account (defined in the generated credentials)
+4. Ensure the spreadsheet can be read by the Google API service account that is being used to authorise requests, either by making the spreadsheet public, or by sharing it with the email associated with the service account (defined in the generated credentials)
 5. Configure the Measure project with an entry for the Outputs processor:
 
 ```yaml
