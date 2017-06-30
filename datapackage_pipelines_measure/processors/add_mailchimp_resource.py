@@ -88,8 +88,8 @@ def mailchimp_collector(list_id, latest_date):
             'source': 'mailchimp',
             'list_id': list_id,
             'date': activity_date,
-            'subs': activity['subs'],
-            'unsubs': activity['unsubs']
+            'subs': activity['subs'] + activity['other_adds'],
+            'unsubs': activity['unsubs'] + activity['other_removes']
         }
         # If date of activity is today, add the subscribers data from general
         # stats.
