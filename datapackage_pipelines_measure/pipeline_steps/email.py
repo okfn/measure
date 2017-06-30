@@ -13,11 +13,22 @@ label = 'email'
 def add_steps(steps: list, pipeline_id: str,
               project_id: str, config: dict) -> list:
 
+    steps.append(('measure.datastore_get_latest', {
+        'resource-name': 'latest-project-entries',
+        'table': 'email',
+        'engine': settings.get('DB_ENGINE'),
+        'distinct_on': ['project_id', 'source', 'list_id']
+    }))
+
     if 'mailchimp' in config:
         for list_id in config['mailchimp']['lists']:
             steps.append(('measure.add_mailchimp_resource', {
                 'list_id': list_id
             }))
+
+    steps.append(('measure.remove_resource', {
+        'name': 'latest-project-entries'
+    }))
 
     steps.append(('concatenate', {
         'target': {

@@ -50,6 +50,7 @@ def _request_general_stats_from_mailchimp(list_id):
 
 def _request_activity_stats_from_mailchimp(list_id, count=None):
     '''Request activity for the list from MailChimp'''
+
     endpoint = '/lists/{list_id}/activity'.format(list_id=list_id)
     if count:
         endpoint = '{}?count={}'.format(endpoint, count)
@@ -70,13 +71,17 @@ def _get_start_date(default_start, latest_date=None):
         return default_start
 
 
-def mailchimp_collector(list_id, latest_date):
+def mailchimp_collector(list_id, latest_row):
     general_stats = _request_general_stats_from_mailchimp(list_id)
     list_created = dateutil.parser.parse(general_stats['date_created']).date()
 
+    latest_date = latest_row['date'] if latest_row else None
     start_date = _get_start_date(list_created, latest_date)
     delta = datetime.date.today() - start_date
-    day_count = delta.days
+    # Count the number of days from the start_date to today. Add an extra day
+    # to include the previous entry, which already exists in the db. We want to
+    # update its `subs` and `unsubs` but retain its `subscribers` value.
+    day_count = delta.days + 1
 
     activity_stats = _request_activity_stats_from_mailchimp(list_id,
                                                             count=day_count)
@@ -95,6 +100,10 @@ def mailchimp_collector(list_id, latest_date):
         # stats.
         if activity_date == datetime.date.today():
             res_row['subscribers'] = general_stats['stats']['member_count']
+        # If date of activity is the latest existing row, add its subscribers
+        # value to the new row, retaining it when updated to the db.
+        if activity_date == latest_date:
+            res_row['subscribers'] = latest_row['subscribers']
         resource_content.append(res_row)
 
     return resource_content
@@ -117,23 +126,23 @@ datapackage['resources'].append(resource)
 
 def process_resources(res_iter, datapackage, list_id):
 
-    def get_latest_date(first):
-        latest_date = None
+    def get_latest_row(first):
+        latest_row = None
         my_rows = []
         for row in first:
             if row['list_id'] == list_id and row['source'] == 'mailchimp':
-                latest_date = row['date']
+                latest_row = row
             my_rows.append(row)
-        return latest_date, iter(my_rows)
+        return latest_row, iter(my_rows)
 
     if len(datapackage['resources']):
         if datapackage['resources'][0]['name'] == 'latest-project-entries':
-            latest_date, latest_iter = get_latest_date(next(res_iter))
+            latest_row, latest_iter = get_latest_row(next(res_iter))
             yield latest_iter
         else:
-            latest_date = None
+            latest_row = None
     yield from res_iter
-    yield mailchimp_collector(list_id, latest_date)
+    yield mailchimp_collector(list_id, latest_row)
 
 
 spew(datapackage, process_resources(res_iter, datapackage, list_id))
