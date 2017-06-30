@@ -101,6 +101,24 @@
             "required": ["sheetid", "gid", "type"]
           },
           "minItems": 1
+        },
+        "email": {
+          "type": "object",
+          "properties": {
+            "mailchimp": {
+              "type": "object",
+              "properties": {
+                "lists": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minItems": 1
+                  }
+                }
+              },
+              "required": ["lists"]
+            }
+          }
         }
       }
     }
