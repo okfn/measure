@@ -1,3 +1,4 @@
+import collections
 import datetime
 import dateutil
 import json
@@ -41,19 +42,26 @@ def _request_data_from_mailchimp(endpoint):
 
 def _request_general_stats_from_mailchimp(list_id):
     '''Request general list data from MailChimp.'''
-
     endpoint = '/lists/{list_id}'.format(list_id=list_id)
     json_response = _request_data_from_mailchimp(endpoint)
 
     return json_response
 
 
-def _request_activity_stats_from_mailchimp(list_id, count=None):
-    '''Request activity for the list from MailChimp'''
+def _request_activity_stats_from_mailchimp(list_id, count):
+    '''Request activity for the list_id from MailChimp.'''
+    endpoint = '/lists/{list_id}/activity?count={count}' \
+        .format(list_id=list_id, count=count)
+    json_response = _request_data_from_mailchimp(endpoint)
 
-    endpoint = '/lists/{list_id}/activity'.format(list_id=list_id)
-    if count:
-        endpoint = '{}?count={}'.format(endpoint, count)
+    return json_response
+
+
+def _request_campaign_stats_from_mailchimp(list_id, since):
+    '''Request campaign stats for the list_id from MailChimp, where the
+    send_time is after `since` (inclusive).'''
+    endpoint = '/campaigns/?list_id={list_id}&since_send_time={since}' \
+        .format(list_id=list_id, since=since)
     json_response = _request_data_from_mailchimp(endpoint)
 
     return json_response
@@ -71,6 +79,15 @@ def _get_start_date(default_start, latest_date=None):
         return default_start
 
 
+def _get_campaigns_number_by_date(list_id, start_date):
+    '''Return a Counter where the key is a date, and value is the number of
+    campaigns sent on that date'''
+    campaigns = _request_campaign_stats_from_mailchimp(list_id, start_date)
+    campaigns_sent = [dateutil.parser.parse(c['send_time']).date()
+                      for c in campaigns['campaigns']]
+    return collections.Counter(campaigns_sent)
+
+
 def mailchimp_collector(list_id, latest_row):
     general_stats = _request_general_stats_from_mailchimp(list_id)
     list_created = dateutil.parser.parse(general_stats['date_created']).date()
@@ -85,6 +102,9 @@ def mailchimp_collector(list_id, latest_row):
 
     activity_stats = _request_activity_stats_from_mailchimp(list_id,
                                                             count=day_count)
+
+    # Get campaign stats for activity_date as a Counter({date obj: integer})
+    campaigns_dates = _get_campaigns_number_by_date(list_id, start_date)
 
     resource_content = []
     for activity in activity_stats['activity']:
@@ -104,6 +124,9 @@ def mailchimp_collector(list_id, latest_row):
         # value to the new row, retaining it when updated to the db.
         if activity_date == latest_date:
             res_row['subscribers'] = latest_row['subscribers']
+        # Add number of campaigns sent from `campaigns_dates`.
+        res_row['campaigns_sent'] = campaigns_dates.get(activity_date, 0)
+
         resource_content.append(res_row)
 
     return resource_content
@@ -117,7 +140,8 @@ resource = {
     'path': 'data/{}.csv'.format(slugify(list_id))
 }
 
-headers = ['source', 'date', 'list_id', 'subs', 'unsubs', 'subscribers']
+headers = ['source', 'date', 'list_id', 'subs', 'unsubs', 'subscribers',
+           'campaigns_sent']
 resource['schema'] = {'fields': [{'name': h, 'type': 'string'}
                                  for h in headers]}
 

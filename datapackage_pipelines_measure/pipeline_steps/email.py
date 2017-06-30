@@ -40,7 +40,8 @@ def add_steps(steps: list, pipeline_id: str,
             'date': [],
             'subscribers': [],
             'subs': [],
-            'unsubs': []
+            'unsubs': [],
+            'campaigns_sent': []
         }
     }))
 
@@ -62,6 +63,9 @@ def add_steps(steps: list, pipeline_id: str,
                 'type': 'integer'
             },
             'unsubs': {
+                'type': 'integer'
+            },
+            'campaigns_sent': {
                 'type': 'integer'
             }
         }
