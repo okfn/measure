@@ -1,4 +1,5 @@
 import collections
+import calendar
 import datetime
 import dateutil
 import json
@@ -67,6 +68,15 @@ def _request_campaign_stats_from_mailchimp(list_id, since):
     return json_response
 
 
+def _request_growth_history_from_mailchimp(list_id, year_month):
+    '''Request growth-history for a give 'yyyy-mm' from MailChimp.'''
+    endpoint = '/lists/{list_id}/growth-history/{year_month}' \
+        .format(list_id=list_id, year_month=year_month)
+    json_response = _request_data_from_mailchimp(endpoint)
+
+    return json_response
+
+
 def _get_start_date(default_start, latest_date=None):
     '''Determine when data collection should start.
 
@@ -120,12 +130,24 @@ def mailchimp_collector(list_id, latest_row):
         # stats.
         if activity_date == datetime.date.today():
             res_row['subscribers'] = general_stats['stats']['member_count']
-        # If date of activity is the latest existing row, add its subscribers
-        # value to the new row, retaining it when updated to the db.
+        # If date of activity is also the latest existing row, add its
+        # subscribers value to the new row, retaining it when updated to db.
         if activity_date == latest_date:
             res_row['subscribers'] = latest_row['subscribers']
         # Add number of campaigns sent from `campaigns_dates`.
         res_row['campaigns_sent'] = campaigns_dates.get(activity_date, 0)
+        # We can collect historical `subscribers` data from MailChimp for the
+        # 1st day of each month. Let's do that if activity_date is the 1st, and
+        # we haven't already populated the value above.
+        activity_month_range = calendar.monthrange(activity_date.year,
+                                                   activity_date.month)
+        if activity_date.day == activity_month_range[1] \
+           and 'subscribers' not in res_row:
+            growth = _request_growth_history_from_mailchimp(
+                list_id,
+                '{}-{:02d}'.format(activity_date.year, activity_date.month)
+            )
+            res_row['subscribers'] = growth['existing']
 
         resource_content.append(res_row)
 
