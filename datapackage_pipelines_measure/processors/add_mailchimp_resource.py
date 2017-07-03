@@ -137,8 +137,8 @@ def mailchimp_collector(list_id, latest_row):
         # Add number of campaigns sent from `campaigns_dates`.
         res_row['campaigns_sent'] = campaigns_dates.get(activity_date, 0)
         # We can collect historical `subscribers` data from MailChimp for the
-        # 1st day of each month. Let's do that if activity_date is the 1st, and
-        # we haven't already populated the value above.
+        # last day of each month. Let's do that if activity_date is the last in
+        # month, and we haven't already populated the value above.
         activity_month_range = calendar.monthrange(activity_date.year,
                                                    activity_date.month)
         if activity_date.day == activity_month_range[1] \
