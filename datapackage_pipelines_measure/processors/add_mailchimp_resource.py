@@ -2,8 +2,8 @@ import collections
 import calendar
 import datetime
 import dateutil
-import json
 
+import simplejson
 import requests
 from requests.auth import HTTPBasicAuth
 
@@ -34,7 +34,7 @@ def _request_data_from_mailchimp(endpoint):
 
     try:
         json_response = mailchimp_response.json()
-    except json.decoder.JSONDecodeError as e:
+    except simplejson.scanner.JSONDecodeError as e:
         log.error('Expected JSON in response from: {}'.format(mailchimp_url))
         raise e
 
@@ -45,7 +45,6 @@ def _request_general_stats_from_mailchimp(list_id):
     '''Request general list data from MailChimp.'''
     endpoint = '/lists/{list_id}'.format(list_id=list_id)
     json_response = _request_data_from_mailchimp(endpoint)
-
     return json_response
 
 
@@ -54,7 +53,6 @@ def _request_activity_stats_from_mailchimp(list_id, count):
     endpoint = '/lists/{list_id}/activity?count={count}' \
         .format(list_id=list_id, count=count)
     json_response = _request_data_from_mailchimp(endpoint)
-
     return json_response
 
 
@@ -64,7 +62,6 @@ def _request_campaign_stats_from_mailchimp(list_id, since):
     endpoint = '/campaigns/?list_id={list_id}&since_send_time={since}' \
         .format(list_id=list_id, since=since)
     json_response = _request_data_from_mailchimp(endpoint)
-
     return json_response
 
 
@@ -73,7 +70,6 @@ def _request_growth_history_from_mailchimp(list_id, year_month):
     endpoint = '/lists/{list_id}/growth-history/{year_month}' \
         .format(list_id=list_id, year_month=year_month)
     json_response = _request_data_from_mailchimp(endpoint)
-
     return json_response
 
 
