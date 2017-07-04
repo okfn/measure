@@ -31,6 +31,33 @@ Potentially, we'd love to see interest from other non-profits who receive funds 
 
 ## Project Configuration
 
+<!-- MarkdownTOC autolink="true" bracket="round" depth=3 -->
+
+  - [Code Hosting](#code-hosting)
+    - [Github](#github)
+  - [Code Packaging](#code-packaging)
+    - [NPM](#npm)
+    - [PyPI](#pypi)
+  - [Social Media](#social-media)
+    - [Twitter](#twitter)
+    - [Facebook](#facebook)
+  - [Website Analytics](#website-analytics)
+    - [Google Analytics](#google-analytics)
+  - [Outputs](#outputs)
+    - [Outputs Captured by Google Forms](#outputs-captured-by-google-forms)
+  - [Email Campaigns](#email-campaigns)
+    - [MailChimp](#mailchimp)
+- [Environmental Variables](#environmental-variables)
+  - [General](#general)
+  - [Github](#github-1)
+  - [Twitter](#twitter-1)
+  - [Facebook](#facebook-1)
+  - [Google credentials for PyPI, Google analytics, and Outputs](#google-credentials-for-pypi-google-analytics-and-outputs)
+  - [MailChimp](#mailchimp-1)
+
+<!-- /MarkdownTOC -->
+
+
 Each project has a `measure.source-spec.yaml` configuration file within a project directory in `/projects`, e.g. for the Frictionless Data project:
 
 ```
