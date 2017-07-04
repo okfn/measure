@@ -68,7 +68,8 @@ class TestMeasureOutputsProcessor(unittest.TestCase):
             'source_id': 'mysheetsid/mygid',
             'source_timestamp': datetime.datetime(2017, 6, 20, 11, 10, 53),
             'source': 'gsheets',
-            'source_type': 'internal'
+            'source_type': 'internal',
+            'output_additional_information': None
         }
         # last row asserts
         assert rows[len(rows)-1] == {
@@ -82,7 +83,8 @@ class TestMeasureOutputsProcessor(unittest.TestCase):
             'source_id': 'mysheetsid/mygid',
             'source_timestamp': datetime.datetime(2017, 6, 22, 8, 11, 24),
             'source': 'gsheets',
-            'source_type': 'internal'
+            'source_type': 'internal',
+            'output_additional_information': None
         }
 
     @mock.patch('datapackage_pipelines_measure.processors.google_utils.get_authorized_http_object') # noqa
@@ -171,6 +173,7 @@ class TestMeasureOutputsProcessor(unittest.TestCase):
             'output_person': 'Alfred',
             'output_title': 'Frictionless Data talk',
             'output_type': 'Talk given',
+            'output_additional_information': None,
             'source_email': 'example@example.com',
             'source_id': 'mysheetsid/mygid',
             'source_timestamp': datetime.datetime(2017, 6, 20, 11, 10, 53),
@@ -185,6 +188,7 @@ class TestMeasureOutputsProcessor(unittest.TestCase):
             'output_person': 'Harvey',
             'output_title': 'A lovely blog post',
             'output_type': 'Tutorial/Guide',
+            'output_additional_information': None,
             'source_email': 'example@example.com',
             'source_id': 'mysheetsid/mygid',
             'source_timestamp': datetime.datetime(2017, 6, 22, 8, 11, 24),
