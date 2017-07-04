@@ -87,6 +87,8 @@ def form_collector(source_id, source_type, latest_date):
             'output_organization': row_dict.get('for-what-organisation'),
             'output_person': row_dict.get('who-did-this'),
             'output_link': row_dict.get('link-if-published'),
+            'output_additional_information':
+                row_dict.get('additional-information'),
             'output_date': output_date
         }
         resource_content.append(res_row)
@@ -128,7 +130,8 @@ resource = {
 
 headers = ['source', 'source_type', 'source_timestamp', 'source_email',
            'output_title', 'output_type', 'output_organization',
-           'output_person', 'output_link', 'output_date']
+           'output_person', 'output_link', 'output_additional_information',
+           'output_date']
 resource['schema'] = {'fields': [{'name': h, 'type': 'string'}
                                  for h in headers]}
 

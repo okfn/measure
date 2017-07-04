@@ -47,6 +47,7 @@ def add_steps(steps: list, pipeline_id: str,
             'output_organization': [],
             'output_person': [],
             'output_link': [],
+            'output_additional_information': [],
             'output_date': []}
     }))
 
@@ -77,6 +78,9 @@ def add_steps(steps: list, pipeline_id: str,
                 'type': 'string'
             },
             'output_link': {
+                'type': 'string'
+            },
+            'output_additional_information': {
                 'type': 'string'
             },
             'output_date': {
