@@ -31,6 +31,33 @@ Potentially, we'd love to see interest from other non-profits who receive funds 
 
 ## Project Configuration
 
+<!-- MarkdownTOC autolink="true" bracket="round" depth=3 -->
+
+  - [Code Hosting](#code-hosting)
+    - [Github](#github)
+  - [Code Packaging](#code-packaging)
+    - [NPM](#npm)
+    - [PyPI](#pypi)
+  - [Social Media](#social-media)
+    - [Twitter](#twitter)
+    - [Facebook](#facebook)
+  - [Website Analytics](#website-analytics)
+    - [Google Analytics](#google-analytics)
+  - [Outputs](#outputs)
+    - [Outputs Captured by Google Forms](#outputs-captured-by-google-forms)
+  - [Email Campaigns](#email-campaigns)
+    - [MailChimp](#mailchimp)
+- [Environmental Variables](#environmental-variables)
+  - [General](#general)
+  - [Github](#github-1)
+  - [Twitter](#twitter-1)
+  - [Facebook](#facebook-1)
+  - [Google credentials for PyPI, Google analytics, and Outputs](#google-credentials-for-pypi-google-analytics-and-outputs)
+  - [MailChimp](#mailchimp-1)
+
+<!-- /MarkdownTOC -->
+
+
 Each project has a `measure.source-spec.yaml` configuration file within a project directory in `/projects`, e.g. for the Frictionless Data project:
 
 ```
@@ -302,6 +329,33 @@ config:
       type: "internal"
 ```
 
+
+### Email Campaigns
+
+#### MailChimp
+
+The MailChimp processor collects email list data each day. For each list the following is collected:
+
+- **subscribers**: The current total number of subscribers to the list.
+- **subs**: The number of added subscribes that day. Counts both opt-ins, and other additions made by admins.
+- **unsubs**: The number of removed subscribers that day. Counts both unsubsribes, and other removals by admins.
+- **campaigns_sent**: The number of campaigns sent that day.
+
+The processor will attempt to collect historic data upto the creation date of the list. Complete data is collected for `subs`, `unsubs`, and `campaigns_sent`. Partial historic data is collected for `subscribers`; once for the last day of each month when collecting historic data.
+
+List ids are added to the project config file:
+
+```yaml
+config:
+  email:
+    mailchimp:
+      lists:
+        - 'my-mailchimp-list-id'
+        - 'another-mailchimp-list-id'
+```
+
+A MailChimp API key must be defined as an environmental variable. See below for details.
+
 ## Environmental Variables
 
 Each installation of Measure requires certain environmental variables to be set.
@@ -337,3 +391,6 @@ See the [PyPI Big Query API](#pypi-configuration) instructions above to get the 
 - `MEASURE_GOOGLE_API_JWT_TOKEN_URI`: {token_uri}
 - `MEASURE_GOOGLE_API_JWT_TYPE`: {type}
 
+### MailChimp
+
+- `MEASURE_MAILCHIMP_API_TOKEN`: {mailchimp_api_key} (note: must include the data center code, e.g. `123abc456def-dc1`, where `dc1` is the data center code).

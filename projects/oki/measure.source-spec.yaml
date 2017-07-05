@@ -24,3 +24,8 @@ config:
           viewid: '16659410'
         - url: 'blog.okfn.org'
           viewid: '16660544'
+
+  email:
+    mailchimp:
+      lists:
+        - '32d370a7fc'
