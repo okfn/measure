@@ -28,6 +28,10 @@ config:
         - 'jsontableschema-sql'
         - 'jsontableschema-bigquery'
         - 'jsontableschema-pandas'
+    rubygems:
+      gems:
+        - 'tableschema'
+        - 'datapackage'
 
   code-hosting:
     github:
