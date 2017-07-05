@@ -31,6 +31,31 @@ Potentially, we'd love to see interest from other non-profits who receive funds 
 
 ## Project Configuration
 
+
+<!-- MarkdownTOC autolink="true" bracket="round" depth=3 -->
+
+  - [Code Hosting](#code-hosting)
+    - [Github](#github)
+  - [Code Packaging](#code-packaging)
+    - [NPM](#npm)
+    - [PyPI](#pypi)
+    - [RubyGems](#rubygems)
+  - [Social Media](#social-media)
+    - [Twitter](#twitter)
+    - [Facebook](#facebook)
+  - [Website Analytics](#website-analytics)
+    - [Google Analytics](#google-analytics)
+  - [Outputs](#outputs)
+    - [Outputs Captured by Google Forms](#outputs-captured-by-google-forms)
+- [Environmental Variables](#environmental-variables)
+  - [General](#general)
+  - [Github](#github-1)
+  - [Twitter](#twitter-1)
+  - [Facebook](#facebook-1)
+  - [Google credentials for PyPI, Google analytics, and Outputs](#google-credentials-for-pypi-google-analytics-and-outputs)
+
+<!-- /MarkdownTOC -->
+
 Each project has a `measure.source-spec.yaml` configuration file within a project directory in `/projects`, e.g. for the Frictionless Data project:
 
 ```
@@ -130,6 +155,24 @@ The PyPI processor requires a Google API account with generated credential to ma
 1. Click on **Options** symbol for **App Engine default service account**, click **Create Key**
 1. Choose Key Type to be **JSON**
 1. The downloaded file will have all the credentials you need. Keep them safe, and use them to [populate the environmental variables below](#pypi-1).
+
+#### RubyGems
+
+The RubyGems processor collects gem package download data from the rubygems.org API.
+
+- **total_downloads**: collected directly from the API
+- **downloads**: daily downloads calculated from yesterday's `total_downloads` value, if present.
+
+```yaml
+config:
+  code-packaging:
+    rubygems:
+      gems:
+        - "tableschema"
+        - "datapackage"
+```
+
+No historical download data is collected for RubyGems.
 
 ### Social Media
 
