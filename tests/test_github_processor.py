@@ -57,9 +57,8 @@ class TestMeasureGithubProcessor(unittest.TestCase):
 
         # Trigger the processor with our mock `ingest` and capture what it will
         # returned to `spew`.
-        spew_args, _ = \
-            mock_processor_test(processor_path,
-                                (params, datapackage, []))
+        spew_args, _ = mock_processor_test(processor_path,
+                                           (params, datapackage, []))
 
         spew_dp = spew_args[0]
         spew_res_iter = spew_args[1]

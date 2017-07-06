@@ -31,6 +31,12 @@ def add_steps(steps: list, pipeline_id: str,
                 'package': slugify(package)
             }))
 
+    if 'rubygems' in config:
+        for gem in config['rubygems']['gems']:
+            steps.append(('measure.add_rubygems_resource', {
+                'gem_id': gem
+            }))
+
     steps.append(('measure.remove_resource', {
         'name': 'latest-project-entries'
     }))
@@ -42,6 +48,7 @@ def add_steps(steps: list, pipeline_id: str,
         'fields': {
             'date': [],
             'downloads': [],
+            'total_downloads': [],
             'source': [],
             'package': []}
     }))
@@ -49,6 +56,9 @@ def add_steps(steps: list, pipeline_id: str,
     steps.append(('set_types', {
         'types': {
             'downloads': {
+                'type': 'integer'
+            },
+            'total_downloads': {
                 'type': 'integer'
             },
             'source': {
