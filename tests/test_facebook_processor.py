@@ -181,8 +181,10 @@ class TestMeasureFacebookProcessor(unittest.TestCase):
 
         # Trigger the processor with our mock `ingest` will return an exception
         error_msg = 'Facebook request returned no data.'
-        with self.assertRaises(ValueError, msg=error_msg):
+        with self.assertRaises(ValueError) as cm:
             mock_processor_test(processor_path, (params, datapackage, []))
+
+        self.assertEqual(str(cm.exception), error_msg)
 
     def test_add_facebook_resource_processor_nopagetoken(self):
         '''Test facebook processor handles when no page token is available.'''
@@ -206,7 +208,9 @@ class TestMeasureFacebookProcessor(unittest.TestCase):
 
         # Trigger the processor with our mock `ingest` and capture what it will
         # returned to `spew`.
-        error_msg = 'No Facebook Page Access Token found for page:'
-        ' "NoPage" in settings'
-        with self.assertRaises(KeyError, msg=error_msg):
+        error_msg = '\'No Facebook Page Access Token found for page ' \
+            '"NoPage" in settings\''
+        with self.assertRaises(KeyError) as cm:
             mock_processor_test(processor_path, (params, datapackage, []))
+
+        self.assertEqual(str(cm.exception), error_msg)

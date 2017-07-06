@@ -157,8 +157,7 @@ class TestMeasureRubygemsProcessor(unittest.TestCase):
             }]
 
     @requests_mock.mock()
-    def test_add_rubygems_resource_processor_latest_today(self,
-                                                              mock_request):
+    def test_add_rubygems_resource_processor_latest_today(self, mock_request):
         '''Latest is today. Get today's data, ensure `downloads` is
         retained.'''
         # mock the rubygems response
@@ -268,9 +267,9 @@ class TestMeasureRubygemsProcessor(unittest.TestCase):
     @requests_mock.Mocker()
     def test_add_rubygems_resource_bad_status(self, mock_request):
         # Mock API responses
+        error_msg = 'Hi, there was a problem with your request.'
         mock_request.get('https://rubygems.org/api/v1/gems/mygem401.json',
-                         text='Hi, there was a problem with your request.',
-                         status_code=401)
+                         text=error_msg, status_code=401)
 
         # input arguments used by our mock `ingest`
         datapackage = {
@@ -294,7 +293,8 @@ class TestMeasureRubygemsProcessor(unittest.TestCase):
                                            (params, datapackage, iter([])))
 
         # Trigger the processor with our mock `ingest` will return an exception
-        with self.assertRaises(Exception):
+        with self.assertRaises(Exception) as cm:
             spew_res_iter = spew_args[1]
             # attempt access to spew_res_iter raises exception
             list(spew_res_iter)
+        self.assertEqual(str(cm.exception), error_msg)

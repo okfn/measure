@@ -264,8 +264,9 @@ class TestMailChimpProcessor(unittest.TestCase):
 
     @requests_mock.Mocker()
     def test_add_mailchimp_resource_bad_status(self, m):
+        error_msg = 'Hi, there was a problem with your request.'
         bad_response = {
-            'detail': 'Hi, there was a problem with your request.'
+            'detail': error_msg
         }
         # Mock API responses
         m.get('https://dc1.api.mailchimp.com/3.0/lists/123456',
@@ -293,7 +294,9 @@ class TestMailChimpProcessor(unittest.TestCase):
                                            (params, datapackage, iter([])))
 
         # Trigger the processor with our mock `ingest` will return an exception
-        with self.assertRaises(Exception):
+        with self.assertRaises(Exception) as cm:
             spew_res_iter = spew_args[1]
             # attempt access to spew_res_iter raises exception
             list(spew_res_iter)
+
+        self.assertEqual(str(cm.exception), error_msg)

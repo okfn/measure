@@ -294,6 +294,10 @@ class TestMeasureTwitterProcessor(unittest.TestCase):
 
         # Trigger the processor with our mock `ingest` and capture what it will
         # returned to `spew`.
-        error_msg = 'Entity, "non-entity", must be an @account or a #hashtag'
-        with self.assertRaises(ValueError, msg=error_msg):
+        # error_msg = 'Entity, "non-entity", must be an @account or a #hashtag'
+        error_msg = 'Entity, "non-entity", must be an @account, #hashtag, ' \
+                    'or url:url-search'
+        with self.assertRaises(ValueError) as cm:
             mock_processor_test(processor_path, (params, datapackage, []))
+
+        self.assertEqual(str(cm.exception), error_msg)

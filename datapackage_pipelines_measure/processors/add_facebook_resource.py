@@ -49,8 +49,9 @@ def _request_data_from_facebook_api(page, metrics, period, since, until):
         try:
             return settings[token_name]
         except KeyError:
-            raise KeyError('No Facebook Page Access Token found for '
-                           'page: "{}" in settings'.format(page))
+            err = 'No Facebook Page Access Token found for page "{}" in ' \
+                'settings'.format(page)
+            raise KeyError(err)
 
     graph.access_token = _get_page_access_token_from_config(page)
     path = '{version}/{page}/insights/'.format(version=FACEBOOK_API_VERSION,
