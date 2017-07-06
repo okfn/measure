@@ -18,7 +18,7 @@ def read(*paths):
 PACKAGE = 'datapackage_pipelines_measure'
 NAME = PACKAGE.replace('_', '-')
 INSTALL_REQUIRES = [
-    'datapackage-pipelines',
+    'datapackage-pipelines==1.0.19',
     'psycopg2',
     'tweepy',
     'facebook-sdk',

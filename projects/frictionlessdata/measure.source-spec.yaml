@@ -32,6 +32,10 @@ config:
       gems:
         - 'tableschema'
         - 'datapackage'
+    packagist:
+      packages:
+        - 'frictionlessdata/tableschema'
+        - 'frictionlessdata/datapackage'
 
   code-hosting:
     github:

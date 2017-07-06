@@ -72,6 +72,15 @@
                 }
               },
               "required": ["gems"]
+            },
+            "packagist": {
+              "type": "object",
+              "properties": {
+                "packages": {
+                  "type": "array"
+                }
+              },
+              "required": ["packages"]
             }
           }
         },
