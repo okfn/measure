@@ -14,7 +14,6 @@ import logging
 log = logging.getLogger(__name__)
 
 FACEBOOK_API_VERSION = 'v2.9'
-FACEBOOK_API_DEFAULT_START_DATE = '2014-09-02'
 FACEBOOK_API_DATE_RANGE_FORMAT = '%Y-%m-%d'
 FACEBOOK_API_MAX_DAYS_IN_RANGE = 92
 DATASTORE_TABLE = 'socialmedia'
@@ -192,16 +191,6 @@ def _get_daily_metrics_from_source(page, start_date, end_date):
         start_date_frame = end_date_frame
 
     return aggregated_metrics
-
-
-def _get_default_start_date():
-    '''Get the default start date, first try from the config.settings, then
-    fallback to the module variable. This enables tests to override the value.
-    '''
-    try:
-        return settings['FACEBOOK_API_DEFAULT_START_DATE']
-    except KeyError:
-        return FACEBOOK_API_DEFAULT_START_DATE
 
 
 parameters, datapackage, res_iter = ingest()
