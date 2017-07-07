@@ -39,6 +39,7 @@ Potentially, we'd love to see interest from other non-profits who receive funds 
     - [NPM](#npm)
     - [PyPI](#pypi)
     - [RubyGems](#rubygems)
+    - [Packagist](#packagist)
   - [Social Media](#social-media)
     - [Twitter](#twitter)
     - [Facebook](#facebook)
@@ -161,7 +162,7 @@ The PyPI processor requires a Google API account with generated credential to ma
 
 #### RubyGems
 
-The RubyGems processor collects gem package download data from the rubygems.org API.
+The RubyGems processor collects ruby gem download data from the rubygems.org API.
 
 - **total_downloads**: collected directly from the API
 - **downloads**: daily downloads calculated from yesterday's `total_downloads` value, if present.
@@ -176,6 +177,26 @@ config:
 ```
 
 No historical download data is collected for RubyGems.
+
+#### Packagist
+
+The Packagist processor collects PHP package daily download data from the packagist.org API.
+
+- **downloads**: daily downloads collected directly from the API.
+
+```yaml
+config:
+  code-packaging:
+    packagist:
+      packages:
+        - "frictionlessdata/tableschema"
+        - "frictionlessdata/datapackage"
+```
+
+Note: `packages` defined in the config must include their owner organization in the form `organization_name/package_name`.
+
+Results from the Packagist.org API appear to be a couple of days behind.
+
 
 ### Social Media
 
