@@ -37,6 +37,12 @@ def add_steps(steps: list, pipeline_id: str,
                 'gem_id': gem
             }))
 
+    if 'packagist' in config:
+        for package in config['packagist']['packages']:
+            steps.append(('measure.add_packagist_resource', {
+                'package': package
+            }))
+
     steps.append(('measure.remove_resource', {
         'name': 'latest-project-entries'
     }))
