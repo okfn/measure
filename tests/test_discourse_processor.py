@@ -35,6 +35,18 @@ ACTIVE_USERS_RESPONSE = [
     {'json': [], 'status_code': 200},
 ]
 
+NEW_TOPICS_RESPONSE_PAGES = [
+    {'json': {'topic_list': {'topics': [{'created_at': '2017-07-01'},
+                                        {'created_at': '2017-07-01'},
+                                        {'created_at': '2017-06-28'}]}},
+     'status_code': 200},
+    {'json': {'topic_list': {'topics': [{'created_at': '2017-06-27'},
+                                        {'created_at': '2017-06-25'},
+                                        {'created_at': '2017-06-24'}]}},
+     'status_code': 200},
+    {'json': {'topic_list': {'topics': []}}, 'status_code': 200}
+]
+
 
 class TestDiscourseProcessor(unittest.TestCase):
 
@@ -48,6 +60,8 @@ class TestDiscourseProcessor(unittest.TestCase):
               NEW_USERS_RESPONSE_PAGES)
         m.get('https://discourse.example.com/admin/users/list/active.json',
               ACTIVE_USERS_RESPONSE)
+        m.get('https://discourse.example.com/latest.json',
+              NEW_TOPICS_RESPONSE_PAGES)
 
         # input arguments used by our mock `ingest`
         datapackage = {
@@ -80,7 +94,7 @@ class TestDiscourseProcessor(unittest.TestCase):
         field_names = \
             [field['name'] for field in dp_resources[0]['schema']['fields']]
         assert field_names == ['domain', 'source', 'date', 'new_users',
-                               'active_users']
+                               'new_topics', 'active_users']
 
         # Asserts for the res_iter
         spew_res_iter_contents = list(spew_res_iter)
@@ -91,6 +105,7 @@ class TestDiscourseProcessor(unittest.TestCase):
         # two new users for first row
         assert rows[0] == {
             'new_users': 2,
+            'new_topics': 2,
             'date': dateutil.parser.parse('2017-07-01').date(),
             'source': 'discourse',
             'domain': 'discourse.example.com'
@@ -99,6 +114,7 @@ class TestDiscourseProcessor(unittest.TestCase):
         assert rows[5] == {
             'active_users': 4,
             'new_users': 0,
+            'new_topics': 0,
             'date': datetime.date.today(),
             'source': 'discourse',
             'domain': 'discourse.example.com'
@@ -114,6 +130,8 @@ class TestDiscourseProcessor(unittest.TestCase):
               NEW_USERS_RESPONSE_PAGES)
         m.get('https://discourse.example.com/admin/users/list/active.json',
               ACTIVE_USERS_RESPONSE)
+        m.get('https://discourse.example.com/latest.json',
+              NEW_TOPICS_RESPONSE_PAGES)
 
         # input arguments used by our mock `ingest`
         datapackage = {
@@ -169,6 +187,7 @@ class TestDiscourseProcessor(unittest.TestCase):
         # two new users for first row
         assert rows[0] == {
             'new_users': 2,
+            'new_topics': 2,
             'date': dateutil.parser.parse('2017-07-01').date(),
             'source': 'discourse',
             'domain': 'discourse.example.com'
@@ -177,6 +196,7 @@ class TestDiscourseProcessor(unittest.TestCase):
         # active_users value
         assert rows[1] == {
             'new_users': 1,
+            'new_topics': 1,
             'active_users': 5,
             'date': dateutil.parser.parse('2017-06-28').date(),
             'source': 'discourse',
@@ -186,6 +206,7 @@ class TestDiscourseProcessor(unittest.TestCase):
         assert rows[2] == {
             'active_users': 4,
             'new_users': 0,
+            'new_topics': 0,
             'date': datetime.date.today(),
             'source': 'discourse',
             'domain': 'discourse.example.com'

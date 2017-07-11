@@ -15,9 +15,11 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def _request_data_from_discourse(domain, endpoint, page=1):
+def _request_data_from_discourse(domain, endpoint, **kwargs):
     api_token = settings['DISCOURSE_API_TOKEN']
-    qs = urllib.parse.urlencode({'api_key': api_token, 'page': page})
+    qs_dict = {'api_key': api_token}
+    qs_dict.update(kwargs)
+    qs = urllib.parse.urlencode(qs_dict)
     url = urllib.parse.urlunparse(
         ('https', domain, endpoint, None, qs, None)
     )
@@ -41,8 +43,40 @@ def _request_data_from_discourse(domain, endpoint, page=1):
 
 def _request_users_from_discourse(domain, flag, page=1):
     endpoint = "/admin/users/list/{}.json".format(flag)
-    response = _request_data_from_discourse(domain, endpoint, page)
-    return response
+    return _request_data_from_discourse(domain, endpoint, page=page)
+
+
+def _request_topics_from_discourse(domain, page=1):
+    endpoint = "/latest.json"
+    response = _request_data_from_discourse(domain, endpoint,
+                                            page=page, order='created')
+    return response['topic_list']['topics']
+
+
+def _get_new_topics_by_date(domain, start_date):
+    '''Return a Counter where the key is a date, and value is the number of new
+    topics for that day.'''
+
+    def _page_new_topics(domain, start_date):
+        '''Request new users by page until an empty array is returned, or we
+        reach a user created before the start_date.'''
+        current_page = 1
+        while True:
+            users = _request_topics_from_discourse(domain, current_page)
+            if len(users) == 0:
+                # Nothing returned for this page, we're done.
+                raise StopIteration
+            current_page = current_page + 1
+            user_dates = [dateutil.parser.parse(u['created_at']).date()
+                          for u in users]
+
+            for user_date in sorted(user_dates, reverse=True):
+                # We're reached before the start_date, we're done.
+                if start_date and user_date < start_date:
+                    raise StopIteration
+                yield user_date
+
+    return collections.Counter(_page_new_topics(domain, start_date))
 
 
 def _get_new_users_number_by_date(domain, start_date):
@@ -97,18 +131,27 @@ def discourse_collector(domain, latest_row):
     latest_date = latest_row['date'] if latest_row else None
     new_users_by_date = _get_new_users_number_by_date(domain, latest_date)
     active_users_response = _get_active_users_number_last_24_hrs(domain)
+    new_topics_by_date = _get_new_topics_by_date(domain, latest_date)
 
-    # Add a placeholder for 'today' if it's not in the returned object.
-    if today not in new_users_by_date:
-        new_users_by_date[today] = 0
+    dd = collections.defaultdict(lambda: {'new_users': 0, 'new_topics': 0})
+    for date, user_num in new_users_by_date.items():
+        dd[date]['new_users'] = user_num
+
+    for date, topic_num in new_topics_by_date.items():
+        dd[date]['new_topics'] = topic_num
+
+    # We want today to exist, if it doesn't, so we can add active_users to it.
+    # Given the magic of defaultdict, to access is to create.
+    dd[today]
 
     resource_content = []
-    for date, count in new_users_by_date.items():
+    for date, stats in dd.items():
         res_row = {
             'source': 'discourse',
             'domain': domain,
             'date': date,
-            'new_users': int(count)
+            'new_users': stats['new_users'],
+            'new_topics': stats['new_topics']
         }
         # add active_users to today's value
         if date == today:
@@ -129,7 +172,8 @@ resource = {
     'path': 'data/{}.csv'.format(slugify(domain))
 }
 
-headers = ['domain', 'source', 'date', 'new_users', 'active_users']
+headers = ['domain', 'source', 'date', 'new_users', 'new_topics',
+           'active_users']
 resource['schema'] = {'fields': [{'name': h, 'type': 'string'}
                                  for h in headers]}
 
