@@ -96,7 +96,7 @@
                     "type": "object",
                     "properties": {
                       "url": {"type": "string"},
-                      "viewid": {"type": ["string", "integer"]}
+                      "viewid": {"type": "string"}
                     },
                     "required": ["url", "viewid"]
                   },
@@ -135,6 +135,24 @@
                 }
               },
               "required": ["lists"]
+            }
+          }
+        },
+        "forums": {
+          "type": "object",
+          "properties": {
+            "discourse": {
+              "type": "object",
+              "properties": {
+                "domains": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": ["domains"]
             }
           }
         }
