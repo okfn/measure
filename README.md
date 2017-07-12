@@ -58,6 +58,7 @@ Potentially, we'd love to see interest from other non-profits who receive funds 
   - [Facebook](#facebook-1)
   - [Google credentials for PyPI, Google analytics, and Outputs](#google-credentials-for-pypi-google-analytics-and-outputs)
   - [MailChimp](#mailchimp-1)
+  - [Discourse](#discourse)
 
 <!-- /MarkdownTOC -->
 
@@ -458,3 +459,7 @@ See the [PyPI Big Query API](#pypi-configuration) instructions above to get the 
 ### MailChimp
 
 - `MEASURE_MAILCHIMP_API_TOKEN`: {mailchimp_api_key} (note: must include the data center code, e.g. `123abc456def-dc1`, where `dc1` is the data center code).
+
+### Discourse
+
+- `MEASURE_DISCOURSE_API_TOKEN`: {discourse_api_token} used to access `/admin` endpoints.
