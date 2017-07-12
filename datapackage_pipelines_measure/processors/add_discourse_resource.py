@@ -14,6 +14,8 @@ from datapackage_pipelines_measure.config import settings
 import logging
 log = logging.getLogger(__name__)
 
+DEFAULT_REPORT_START_DATE = '2014-01-01'
+
 
 def _request_data_from_discourse(domain, endpoint, **kwargs):
     api_token = settings['DISCOURSE_API_TOKEN']
@@ -46,63 +48,19 @@ def _request_users_from_discourse(domain, flag, page=1):
     return _request_data_from_discourse(domain, endpoint, page=page)
 
 
-def _request_topics_from_discourse(domain, page=0):
-    endpoint = "/latest.json"
-    response = _request_data_from_discourse(domain, endpoint,
-                                            page=page, order='created')
-    return response['topic_list']['topics']
-
-
-def _get_new_topics_by_date(domain, start_date):
-    '''Return a Counter where the key is a date, and value is the number of new
-    topics for that day.'''
-
-    def _page_new_topics(domain, start_date):
-        '''Request new topics by page until an empty array is returned, or we
-        reach a topic created before the start_date.'''
-        current_page = 0  # /latest.json paging starts at zero
-        while True:
-            topics = _request_topics_from_discourse(domain, current_page)
-            if len(topics) == 0:
-                # Nothing returned for this page, we're done.
-                raise StopIteration
-            current_page = current_page + 1
-            topic_dates = [dateutil.parser.parse(u['created_at']).date()
-                           for u in topics]
-
-            for topic_date in sorted(topic_dates, reverse=True):
-                # We're reached before the start_date, we're done.
-                if start_date and topic_date < start_date:
-                    raise StopIteration
-                yield topic_date
-
-    return collections.Counter(_page_new_topics(domain, start_date))
-
-
-def _get_new_users_number_by_date(domain, start_date):
-    '''Return a Counter where the key is a date, and value is the number of new
-    users for that day.'''
-
-    def _page_new_users(domain, start_date):
-        '''Request new users by page until an empty array is returned, or we
-        reach a user created before the start_date.'''
-        current_page = 1  # /admin/users/list paging starts at one
-        while True:
-            users = _request_users_from_discourse(domain, 'new', current_page)
-            if len(users) == 0:
-                # Nothing returned for this page, we're done.
-                raise StopIteration
-            current_page = current_page + 1
-            user_dates = [dateutil.parser.parse(u['created_at']).date()
-                          for u in users]
-
-            for user_date in sorted(user_dates, reverse=True):
-                # We're reached before the start_date, we're done.
-                if start_date and user_date < start_date:
-                    raise StopIteration
-                yield user_date
-
-    return collections.Counter(_page_new_users(domain, start_date))
+def _request_report_from_discourse(domain, report, start_date, end_date=None):
+    '''Request a report from discourse and return a dict of <date: count> key
+    values.'''
+    if end_date is None:
+        end_date = datetime.date.today().strftime("%Y-%m-%d")
+    if start_date is None:
+        start_date = DEFAULT_REPORT_START_DATE
+    endpoint = "/admin/reports/{}.json".format(report)
+    data = _request_data_from_discourse(domain, endpoint,
+                                        start_date=start_date,
+                                        end_date=end_date,
+                                        category_id='all')['report']['data']
+    return {dateutil.parser.parse(d['x']).date(): d['y'] for d in data}
 
 
 def _get_active_users_number_last_24_hrs(domain):
@@ -129,16 +87,31 @@ def _get_active_users_number_last_24_hrs(domain):
 def discourse_collector(domain, latest_row):
     today = datetime.date.today()
     latest_date = latest_row['date'] if latest_row else None
-    new_users_by_date = _get_new_users_number_by_date(domain, latest_date)
     active_users_response = _get_active_users_number_last_24_hrs(domain)
-    new_topics_by_date = _get_new_topics_by_date(domain, latest_date)
+    new_users_by_date = \
+        _request_report_from_discourse(domain, 'signups', latest_date)
+    new_topics_by_date = \
+        _request_report_from_discourse(domain, 'topics', latest_date)
+    new_posts_by_date = \
+        _request_report_from_discourse(domain, 'posts', latest_date)
+    visits_by_date = \
+        _request_report_from_discourse(domain, 'visits', latest_date)
 
-    dd = collections.defaultdict(lambda: {'new_users': 0, 'new_topics': 0})
+    dd = collections.defaultdict(lambda: {'new_users': 0,
+                                          'new_topics': 0,
+                                          'new_posts': 0,
+                                          'visits': 0})
     for date, user_num in new_users_by_date.items():
         dd[date]['new_users'] = user_num
 
     for date, topic_num in new_topics_by_date.items():
         dd[date]['new_topics'] = topic_num
+
+    for date, post_num in new_posts_by_date.items():
+        dd[date]['new_posts'] = post_num
+
+    for date, visits_num in visits_by_date.items():
+        dd[date]['visits'] = visits_num
 
     # We want today to exist, if it doesn't, so we can add active_users to it.
     # Given the magic of defaultdict, to access is to create.
@@ -151,7 +124,9 @@ def discourse_collector(domain, latest_row):
             'domain': domain,
             'date': date,
             'new_users': stats['new_users'],
-            'new_topics': stats['new_topics']
+            'new_topics': stats['new_topics'],
+            'new_posts': stats['new_posts'],
+            'visits': stats['visits']
         }
         # add active_users to today's value
         if date == today:
@@ -173,7 +148,7 @@ resource = {
 }
 
 headers = ['domain', 'source', 'date', 'new_users', 'new_topics',
-           'active_users']
+           'new_posts', 'visits', 'active_users']
 resource['schema'] = {'fields': [{'name': h, 'type': 'string'}
                                  for h in headers]}
 

@@ -35,6 +35,8 @@ def add_steps(steps: list, pipeline_id: str,
             'domain': [],
             'new_users': [],
             'new_topics': [],
+            'new_posts': [],
+            'visits': [],
             'active_users': [],
             'source': [],
             'date': []}
@@ -52,6 +54,12 @@ def add_steps(steps: list, pipeline_id: str,
                 'type': 'integer'
             },
             'new_topics': {
+                'type': 'integer'
+            },
+            'new_posts': {
+                'type': 'integer'
+            },
+            'visits': {
                 'type': 'integer'
             },
             'active_users': {

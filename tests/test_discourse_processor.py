@@ -15,15 +15,28 @@ import datapackage_pipelines_measure.processors
 import logging
 log = logging.getLogger(__name__)
 
-NEW_USERS_RESPONSE_PAGES = [
-    {'json': [{'created_at': '2017-07-01'},
-              {'created_at': '2017-07-01'},
-              {'created_at': '2017-06-28'}], 'status_code': 200},
-    {'json': [{'created_at': '2017-06-27'},
-              {'created_at': '2017-06-25'},
-              {'created_at': '2017-06-24'}], 'status_code': 200},
-    {'json': [], 'status_code': 200},
-]
+REPORT_RESPONSE = {
+    "report": {
+        "data": [
+            {"x": "2017-07-05", "y": 1},
+            {"x": "2017-07-06", "y": 2},
+            {"x": "2017-07-07", "y": 3},
+            {"x": "2017-07-09", "y": 4},
+            {"x": "2017-07-10", "y": 5},
+            {"x": "2017-07-11", "y": 6}
+        ]
+    }
+}
+
+RESTRICTED_REPORT_RESPONSE = {
+    "report": {
+        "data": [
+            {"x": "2017-07-09", "y": 4},
+            {"x": "2017-07-10", "y": 5},
+            {"x": "2017-07-11", "y": 6}
+        ]
+    }
+}
 
 ACTIVE_USERS_RESPONSE = [
     {'json': [{'last_seen_age': '3m'},
@@ -35,18 +48,6 @@ ACTIVE_USERS_RESPONSE = [
     {'json': [], 'status_code': 200},
 ]
 
-NEW_TOPICS_RESPONSE_PAGES = [
-    {'json': {'topic_list': {'topics': [{'created_at': '2017-07-01'},
-                                        {'created_at': '2017-07-01'},
-                                        {'created_at': '2017-06-28'}]}},
-     'status_code': 200},
-    {'json': {'topic_list': {'topics': [{'created_at': '2017-06-27'},
-                                        {'created_at': '2017-06-25'},
-                                        {'created_at': '2017-06-24'}]}},
-     'status_code': 200},
-    {'json': {'topic_list': {'topics': []}}, 'status_code': 200}
-]
-
 
 class TestDiscourseProcessor(unittest.TestCase):
 
@@ -56,12 +57,16 @@ class TestDiscourseProcessor(unittest.TestCase):
         where possible.'''
 
         # Mock API responses
-        m.get('https://discourse.example.com/admin/users/list/new.json',
-              NEW_USERS_RESPONSE_PAGES)
+        m.get('https://discourse.example.com/admin/reports/signups.json',
+              json=REPORT_RESPONSE)
         m.get('https://discourse.example.com/admin/users/list/active.json',
               ACTIVE_USERS_RESPONSE)
-        m.get('https://discourse.example.com/latest.json',
-              NEW_TOPICS_RESPONSE_PAGES)
+        m.get('https://discourse.example.com/admin/reports/topics.json',
+              json=REPORT_RESPONSE)
+        m.get('https://discourse.example.com/admin/reports/visits.json',
+              json=REPORT_RESPONSE)
+        m.get('https://discourse.example.com/admin/reports/posts.json',
+              json=REPORT_RESPONSE)
 
         # input arguments used by our mock `ingest`
         datapackage = {
@@ -94,27 +99,31 @@ class TestDiscourseProcessor(unittest.TestCase):
         field_names = \
             [field['name'] for field in dp_resources[0]['schema']['fields']]
         assert field_names == ['domain', 'source', 'date', 'new_users',
-                               'new_topics', 'active_users']
+                               'new_topics', 'new_posts', 'visits',
+                               'active_users']
 
         # Asserts for the res_iter
         spew_res_iter_contents = list(spew_res_iter)
         assert len(list(spew_res_iter_contents)) == 1
         rows = list(spew_res_iter_contents)[0]
-        # six days of data
-        assert len(rows) == 6
-        # two new users for first row
+        # seven days of data
+        assert len(rows) == 7
         assert rows[0] == {
-            'new_users': 2,
-            'new_topics': 2,
-            'date': dateutil.parser.parse('2017-07-01').date(),
+            'new_users': 1,
+            'new_topics': 1,
+            'new_posts': 1,
+            'visits': 1,
+            'date': dateutil.parser.parse('2017-07-05').date(),
             'source': 'discourse',
             'domain': 'discourse.example.com'
         }
         # four active users for today
-        assert rows[5] == {
+        assert rows[len(rows) - 1] == {
             'active_users': 4,
             'new_users': 0,
             'new_topics': 0,
+            'new_posts': 0,
+            'visits': 0,
             'date': datetime.date.today(),
             'source': 'discourse',
             'domain': 'discourse.example.com'
@@ -126,12 +135,16 @@ class TestDiscourseProcessor(unittest.TestCase):
         latest where possible.'''
 
         # Mock API responses
-        m.get('https://discourse.example.com/admin/users/list/new.json',
-              NEW_USERS_RESPONSE_PAGES)
+        m.get('https://discourse.example.com/admin/reports/signups.json',
+              json=RESTRICTED_REPORT_RESPONSE)
         m.get('https://discourse.example.com/admin/users/list/active.json',
               ACTIVE_USERS_RESPONSE)
-        m.get('https://discourse.example.com/latest.json',
-              NEW_TOPICS_RESPONSE_PAGES)
+        m.get('https://discourse.example.com/admin/reports/topics.json',
+              json=RESTRICTED_REPORT_RESPONSE)
+        m.get('https://discourse.example.com/admin/reports/visits.json',
+              json=RESTRICTED_REPORT_RESPONSE)
+        m.get('https://discourse.example.com/admin/reports/posts.json',
+              json=RESTRICTED_REPORT_RESPONSE)
 
         # input arguments used by our mock `ingest`
         datapackage = {
@@ -153,7 +166,10 @@ class TestDiscourseProcessor(unittest.TestCase):
                     'active_users': 5,
                     'domain': 'discourse.example.com',
                     'new_users': 1,
-                    'date': dateutil.parser.parse('2017-06-28').date(),
+                    'new_posts': 1,
+                    'new_topics': 1,
+                    'visits': 1,
+                    'date': dateutil.parser.parse('2017-07-09').date(),
                     'source': 'discourse'
                 }
 
@@ -182,31 +198,36 @@ class TestDiscourseProcessor(unittest.TestCase):
         spew_res_iter_contents = list(spew_res_iter)
         assert len(list(spew_res_iter_contents)) == 2
         rows = list(spew_res_iter_contents)[1]
-        # six days of data
-        assert len(rows) == 3
-        # two new users for first row
+        # four days of data
+        assert len(rows) == 4
+        # This was the row retrieved from latest-project-entries, retain
+        # active_users value
         assert rows[0] == {
-            'new_users': 2,
-            'new_topics': 2,
-            'date': dateutil.parser.parse('2017-07-01').date(),
+            'new_users': 4,
+            'new_topics': 4,
+            'new_posts': 4,
+            'visits': 4,
+            'active_users': 5,
+            'date': dateutil.parser.parse('2017-07-09').date(),
             'source': 'discourse',
             'domain': 'discourse.example.com'
         }
-        # this was the row retrieved from latest-project-entries, retain
-        # active_users value
         assert rows[1] == {
-            'new_users': 1,
-            'new_topics': 1,
-            'active_users': 5,
-            'date': dateutil.parser.parse('2017-06-28').date(),
+            'new_users': 5,
+            'new_topics': 5,
+            'new_posts': 5,
+            'visits': 5,
+            'date': dateutil.parser.parse('2017-07-10').date(),
             'source': 'discourse',
             'domain': 'discourse.example.com'
         }
         # four active users for today
-        assert rows[2] == {
+        assert rows[len(rows) - 1] == {
             'active_users': 4,
             'new_users': 0,
             'new_topics': 0,
+            'new_posts': 0,
+            'visits': 0,
             'date': datetime.date.today(),
             'source': 'discourse',
             'domain': 'discourse.example.com'
@@ -217,7 +238,7 @@ class TestDiscourseProcessor(unittest.TestCase):
         '''Bad status api responses from discourse.'''
 
         # Mock API responses
-        m.get('https://discourse.example.com/admin/users/list/new.json',
+        m.get('https://discourse.example.com/admin/users/list/active.json',
               text="bad response", status_code=401)
 
         # input arguments used by our mock `ingest`
@@ -254,7 +275,7 @@ class TestDiscourseProcessor(unittest.TestCase):
         '''Response isn't json error.'''
 
         # Mock API responses
-        m.get('https://discourse.example.com/admin/users/list/new.json',
+        m.get('https://discourse.example.com/admin/users/list/active.json',
               text="bad response", status_code=200)
 
         # input arguments used by our mock `ingest`
@@ -283,5 +304,5 @@ class TestDiscourseProcessor(unittest.TestCase):
             spew_res_iter = spew_args[1]
             # attempt access to spew_res_iter raises exception
             list(spew_res_iter)
-        error_msg = "Expected JSON in response from: https://discourse.example.com/admin/users/list/new.json?api_key=myfakediscoursetoken&page=1"  # noqa
+        error_msg = "Expected JSON in response from: https://discourse.example.com/admin/users/list/active.json?api_key=myfakediscoursetoken&page=1"  # noqa
         self.assertEqual(str(cm.exception), error_msg)
