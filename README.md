@@ -49,6 +49,8 @@ Potentially, we'd love to see interest from other non-profits who receive funds 
     - [Outputs Captured by Google Forms](#outputs-captured-by-google-forms)
   - [Email Campaigns](#email-campaigns)
     - [MailChimp](#mailchimp)
+  - [Forums](#forums)
+    - [Discourse \(Instance\)](#discourse-instance)
 - [Environmental Variables](#environmental-variables)
   - [General](#general)
   - [Github](#github-1)
@@ -395,6 +397,28 @@ config:
 ```
 
 A MailChimp API key must be defined as an environmental variable. See below for details.
+
+### Forums
+
+#### Discourse (Instance)
+
+The Discourse processor collects daily forum data from an instance of a Discourse forum. For each domain listed in the config the following is collected:
+
+- **active_users**: The number of active users that day (no historic data available).
+- **new_users**: The number of newly signed up users for that day.
+- **new_topics**: The number of new topics created that day.
+- **new_posts**: The number of new posts created that day.
+- **visits**: The number of user visits that day.
+
+The processor will collect historic data for all properties up to 2014-01-01 (except `active_users`).
+
+```yaml
+config:
+  forums:
+    discourse:
+      domains:
+        - 'discourse.example.com'
+```
 
 ## Environmental Variables
 
