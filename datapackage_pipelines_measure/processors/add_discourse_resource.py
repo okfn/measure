@@ -46,7 +46,7 @@ def _request_users_from_discourse(domain, flag, page=1):
     return _request_data_from_discourse(domain, endpoint, page=page)
 
 
-def _request_topics_from_discourse(domain, page=1):
+def _request_topics_from_discourse(domain, page=0):
     endpoint = "/latest.json"
     response = _request_data_from_discourse(domain, endpoint,
                                             page=page, order='created')
@@ -58,23 +58,23 @@ def _get_new_topics_by_date(domain, start_date):
     topics for that day.'''
 
     def _page_new_topics(domain, start_date):
-        '''Request new users by page until an empty array is returned, or we
-        reach a user created before the start_date.'''
-        current_page = 1
+        '''Request new topics by page until an empty array is returned, or we
+        reach a topic created before the start_date.'''
+        current_page = 0  # /latest.json paging starts at zero
         while True:
-            users = _request_topics_from_discourse(domain, current_page)
-            if len(users) == 0:
+            topics = _request_topics_from_discourse(domain, current_page)
+            if len(topics) == 0:
                 # Nothing returned for this page, we're done.
                 raise StopIteration
             current_page = current_page + 1
-            user_dates = [dateutil.parser.parse(u['created_at']).date()
-                          for u in users]
+            topic_dates = [dateutil.parser.parse(u['created_at']).date()
+                           for u in topics]
 
-            for user_date in sorted(user_dates, reverse=True):
+            for topic_date in sorted(topic_dates, reverse=True):
                 # We're reached before the start_date, we're done.
-                if start_date and user_date < start_date:
+                if start_date and topic_date < start_date:
                     raise StopIteration
-                yield user_date
+                yield topic_date
 
     return collections.Counter(_page_new_topics(domain, start_date))
 
@@ -86,7 +86,7 @@ def _get_new_users_number_by_date(domain, start_date):
     def _page_new_users(domain, start_date):
         '''Request new users by page until an empty array is returned, or we
         reach a user created before the start_date.'''
-        current_page = 1
+        current_page = 1  # /admin/users/list paging starts at one
         while True:
             users = _request_users_from_discourse(domain, 'new', current_page)
             if len(users) == 0:
@@ -111,7 +111,7 @@ def _get_active_users_number_last_24_hrs(domain):
     def _page_active_users(domain):
         '''Request active users by page until an empty array is return, or we
         reach a user created after the last 24hr'''
-        current_page = 1
+        current_page = 1  # /admin/users/list paging starts at one
         while True:
             users = _request_users_from_discourse(domain, 'active',
                                                   current_page)
