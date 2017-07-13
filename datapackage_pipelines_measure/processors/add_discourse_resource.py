@@ -1,66 +1,21 @@
 import collections
 import datetime
-import dateutil
-import urllib
-
-import simplejson
-import requests
 
 from datapackage_pipelines.generators import slugify
 from datapackage_pipelines.wrapper import ingest, spew
 
-from datapackage_pipelines_measure.config import settings
+from datapackage_pipelines_measure.processors.discourse_utils import (
+    request_data_from_discourse,
+    request_report_from_discourse
+)
 
 import logging
 log = logging.getLogger(__name__)
 
-DEFAULT_REPORT_START_DATE = '2014-01-01'
-
-
-def _request_data_from_discourse(domain, endpoint, **kwargs):
-    api_token = settings['DISCOURSE_API_TOKEN']
-    qs_dict = {'api_key': api_token}
-    qs_dict.update(kwargs)
-    qs = urllib.parse.urlencode(qs_dict)
-    url = urllib.parse.urlunparse(
-        ('https', domain, endpoint, None, qs, None)
-    )
-    response = requests.get(url)
-    if response.status_code != 200:
-        raise ValueError(
-            'Error raised for domain:{}, '
-            'Status code:{}. '
-            'Error message: {}'.format(domain,
-                                       response.status_code,
-                                       response.content))
-
-    try:
-        json_response = response.json()
-    except simplejson.scanner.JSONDecodeError as e:
-        log.error('Expected JSON in response from: {}'.format(url))
-        raise ValueError('Expected JSON in response from: {}'.format(url))
-
-    return json_response
-
 
 def _request_users_from_discourse(domain, flag, page=1):
     endpoint = "/admin/users/list/{}.json".format(flag)
-    return _request_data_from_discourse(domain, endpoint, page=page)
-
-
-def _request_report_from_discourse(domain, report, start_date, end_date=None):
-    '''Request a report from discourse and return a dict of <date: count> key
-    values.'''
-    if end_date is None:
-        end_date = datetime.date.today().strftime("%Y-%m-%d")
-    if start_date is None:
-        start_date = DEFAULT_REPORT_START_DATE
-    endpoint = "/admin/reports/{}.json".format(report)
-    data = _request_data_from_discourse(domain, endpoint,
-                                        start_date=start_date,
-                                        end_date=end_date,
-                                        category_id='all')['report']['data']
-    return {dateutil.parser.parse(d['x']).date(): d['y'] for d in data}
+    return request_data_from_discourse(domain, endpoint, page=page)
 
 
 def _get_active_users_number_last_24_hrs(domain):
@@ -89,13 +44,13 @@ def discourse_collector(domain, latest_row):
     latest_date = latest_row['date'] if latest_row else None
     active_users_response = _get_active_users_number_last_24_hrs(domain)
     new_users_by_date = \
-        _request_report_from_discourse(domain, 'signups', latest_date)
+        request_report_from_discourse(domain, 'signups', latest_date)
     new_topics_by_date = \
-        _request_report_from_discourse(domain, 'topics', latest_date)
+        request_report_from_discourse(domain, 'topics', latest_date)
     new_posts_by_date = \
-        _request_report_from_discourse(domain, 'posts', latest_date)
+        request_report_from_discourse(domain, 'posts', latest_date)
     visits_by_date = \
-        _request_report_from_discourse(domain, 'visits', latest_date)
+        request_report_from_discourse(domain, 'visits', latest_date)
 
     dd = collections.defaultdict(lambda: {'new_users': 0,
                                           'new_topics': 0,
