@@ -51,6 +51,8 @@ Potentially, we'd love to see interest from other non-profits who receive funds 
     - [MailChimp](#mailchimp)
   - [Forums](#forums)
     - [Discourse \(Instance\)](#discourse-instance)
+  - [Forum Categories](#forum-categories)
+    - [Discourse Categories](#discourse-categories)
 - [Environmental Variables](#environmental-variables)
   - [General](#general)
   - [Github](#github-1)
@@ -420,6 +422,38 @@ config:
       domains:
         - 'discourse.example.com'
 ```
+
+
+### Forum Categories
+
+Closely related to the **Forums** pipeline above, providing a table to collect data about specific categories within a forum.
+
+#### Discourse Categories
+
+This processor collects daily data for each specified category within a Discourse forum domain. Each category listed for a domain will have the following data collected:
+
+- **new_topics**: The number of new topics created that day.
+- **new_posts**: The number of new posts created that day.
+
+```yaml
+config:
+  forum-categories:
+    discourse-categories:
+      - domain: 'discourse.example.com'
+        categories:
+          - name: 'my-toplevel-category' # will collect subcategory data
+            children: 'expand'
+          - name: 'another-toplevel-category' # will aggregate subcategory data
+            children: 'aggregate'
+          - name: 'a-category' # will ignore subcategory data
+```
+
+Each category needs to specify a `name`, which is the slugified version of the category name (as it appears in the Discourse forum url), and an optional `children` parameter. The `children` parameter will determine how subcategories of the specified category are treated. It can accept one of:
+
+- `none`: Do not collect any data about subcategories of `name`. This is the default behaviour.
+- `aggregate`: Collect data for each subcategory of `name`, and add it to the appropriate value on `name`.
+- `expand`: Collect data for each subcategory of `name`, and add them as separate rows, as if they had been explicitly defined.
+
 
 ## Environmental Variables
 
