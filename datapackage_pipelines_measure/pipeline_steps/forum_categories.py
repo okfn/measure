@@ -12,7 +12,7 @@ def add_steps(steps: list, pipeline_id: str,
 
     steps.append(('measure.datastore_get_latest', {
         'resource-name': 'latest-project-entries',
-        'table': 'forum-categories',
+        'table': 'forum_categories',
         'engine': settings.get('DB_ENGINE'),
         'distinct_on': ['project_id', 'domain', 'source', 'category']
     }))
@@ -31,7 +31,7 @@ def add_steps(steps: list, pipeline_id: str,
     steps.append(('concatenate', {
         'target': {
             'name': 'forum-categories',
-            'path': 'data/forums.json'},
+            'path': 'data/forum-categories.json'},
         'fields': {
             'domain': [],
             'category': [],
@@ -77,7 +77,7 @@ def add_steps(steps: list, pipeline_id: str,
     steps.append(('dump.to_sql', {
         'engine': settings['DB_ENGINE'],
         'tables': {
-            'forum-categories': {
+            'forum_categories': {
                 'resource-name': 'forum-categories',
                 'mode': 'update',
                 'update_keys': ['domain', 'category', 'source',

@@ -1,6 +1,7 @@
 import datetime
 import dateutil
 import urllib
+import functools
 
 import requests
 import simplejson
@@ -54,3 +55,23 @@ def request_report_from_discourse(domain, report, start_date,
         end_date=end_date,
         category_id=category_id)['report']['data']
     return {dateutil.parser.parse(d['x']).date(): d['y'] for d in data}
+
+
+@functools.lru_cache(maxsize=64)
+def get_category_info_from_discourse(domain):
+    '''Return a list of top-level category names and ids, and their
+    subcategories, where appropriate. '''
+    endpoint = "/site.json"
+    site_data = request_data_from_discourse(domain, endpoint)
+    top_level = [{'id': c['id'], 'name': c['name'],
+                  'slug': c['slug'], 'subcategories': []}
+                 for c in site_data['categories']
+                 if 'parent_category_id' not in c]
+    for c in site_data['categories']:
+        if 'parent_category_id' in c:
+            parent = next(pc for pc in top_level
+                          if pc['id'] == c['parent_category_id'])
+            parent['subcategories'].append({'id': c['id'], 'slug': c['slug'],
+                                            'name': c['name'],
+                                            'subcategories': None})
+    return top_level

@@ -7,7 +7,7 @@ DOWNLOADS_PATH = os.path.join(os.path.dirname(__file__), '../../downloads')
 label = 'forums'
 
 
-def add_steps(steps: list, pipeline_id: str,
+def add_steps(steps: str, pipeline_id: str,
               project_id: str, config: dict) -> list:
 
     steps.append(('measure.datastore_get_latest', {

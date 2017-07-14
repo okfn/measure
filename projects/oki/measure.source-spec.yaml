@@ -34,11 +34,3 @@ config:
     discourse:
       domains:
         - 'discuss.okfn.org'
-  forum-categories:
-    discourse-categories:
-      - domain: 'discuss.okfn.org'
-        categories:
-          - name: 'open-data-index'
-            children: 'none (default), aggregate, expand'
-          - name: 'international-open-data-roadmap'
-            children: 'none'
