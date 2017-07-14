@@ -95,7 +95,7 @@ parameters, datapackage, res_iter = ingest()
 
 domain = parameters['domain']
 category = parameters['category']['name']
-child_treatment = parameters['category']['children']
+child_treatment = parameters['category'].get('children', None)
 
 resource = {
     'name': slugify(domain),
