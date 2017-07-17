@@ -445,7 +445,7 @@ config:
             children: 'expand'
           - name: 'another-toplevel-category' # will aggregate subcategory data
             children: 'aggregate'
-          - name: 'a-category' # will ignore subcategory data
+          - name: 'a-category' # no `children` defined, will ignore subcategory data
 ```
 
 Each category needs to specify a `name`, which is the slugified version of the category name (as it appears in the Discourse forum url), and an optional `children` parameter. The `children` parameter will determine how subcategories of the specified category are treated. It can accept one of:
