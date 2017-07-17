@@ -34,3 +34,38 @@ config:
     discourse:
       domains:
         - 'discuss.okfn.org'
+
+  forum-categories:
+    discourse-categories:
+      - domain: 'discuss.okfn.org'
+        categories:
+          - name: 'open-data-index'
+            children: 'expand'
+          - name: 'network-and-community'
+            children: 'expand'
+          - name: 'local-groups'
+            children: 'expand'
+          - name: 'projects'
+            children: 'expand'
+          - name: 'open-knowledge-labs'
+            children: 'expand'
+          - name: 'policy-research'
+            children: 'expand'
+          - name: 'openspending'
+            children: 'expand'
+          - name: 'frictionless-data'
+            children: 'expand'
+          - name: 'working-groups'
+            children: 'expand'
+          - name: 'meta'
+            children: 'expand'
+          - name: 'iodc-unconference'
+            children: 'expand'
+          - name: 'staff'
+            children: 'expand'
+          - name: 'chapters'
+            children: 'expand'
+          - name: 'Sweden'
+            children: 'expand'
+          - name: 'international-open-data-roadmap'
+            children: 'expand'
