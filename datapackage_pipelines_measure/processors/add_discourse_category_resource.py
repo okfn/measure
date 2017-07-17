@@ -24,7 +24,7 @@ def _get_category_child_ids(domain, category_id):
     return parent_category['subcategories']
 
 
-def discourse_collector(domain, category, child_treatment, latest_row):
+def discourse_collector(domain, category, child_treatment, latest_row):  # noqa (ignore mccabe for this function)
     def _make_stats_dict_for_category_id(category_id, category_name):
         '''Return a defaultdict where items have a date as a key, and category
         stats for a value, for a given category_id and category_name'''
