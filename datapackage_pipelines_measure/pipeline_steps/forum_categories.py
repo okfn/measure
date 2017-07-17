@@ -4,23 +4,24 @@ from datapackage_pipelines_measure.config import settings
 
 DOWNLOADS_PATH = os.path.join(os.path.dirname(__file__), '../../downloads')
 
-label = 'forums'
+label = 'forum-categories'
 
 
-def add_steps(steps: str, pipeline_id: str,
+def add_steps(steps: list, pipeline_id: str,
               project_id: str, config: dict) -> list:
 
     steps.append(('measure.datastore_get_latest', {
         'resource-name': 'latest-project-entries',
-        'table': 'forums',
+        'table': 'forum_categories',
         'engine': settings.get('DB_ENGINE'),
-        'distinct_on': ['project_id', 'domain', 'source']
+        'distinct_on': ['project_id', 'domain', 'source', 'category']
     }))
 
-    if 'discourse' in config:
-        for domain in config['discourse']['domains']:
-            steps.append(('measure.add_discourse_resource', {
-                'domain': domain
+    for domain_categories in config['discourse-categories']:
+        for category in domain_categories['categories']:
+            steps.append(('measure.add_discourse_category_resource', {
+                'category': category,
+                'domain': domain_categories['domain']
             }))
 
     steps.append(('measure.remove_resource', {
@@ -29,15 +30,13 @@ def add_steps(steps: str, pipeline_id: str,
 
     steps.append(('concatenate', {
         'target': {
-            'name': 'forums',
-            'path': 'data/forums.json'},
+            'name': 'forum-categories',
+            'path': 'data/forum-categories.json'},
         'fields': {
             'domain': [],
-            'new_users': [],
+            'category': [],
             'new_topics': [],
             'new_posts': [],
-            'visits': [],
-            'active_users': [],
             'source': [],
             'date': []}
     }))
@@ -47,22 +46,16 @@ def add_steps(steps: str, pipeline_id: str,
             'domain': {
                 'type': 'string',
             },
-            'source': {
+            'category': {
                 'type': 'string',
             },
-            'new_users': {
-                'type': 'integer'
+            'source': {
+                'type': 'string',
             },
             'new_topics': {
                 'type': 'integer'
             },
             'new_posts': {
-                'type': 'integer'
-            },
-            'visits': {
-                'type': 'integer'
-            },
-            'active_users': {
                 'type': 'integer'
             },
             'date': {
@@ -84,10 +77,11 @@ def add_steps(steps: str, pipeline_id: str,
     steps.append(('dump.to_sql', {
         'engine': settings['DB_ENGINE'],
         'tables': {
-            'forums': {
-                'resource-name': 'forums',
+            'forum_categories': {
+                'resource-name': 'forum-categories',
                 'mode': 'update',
-                'update_keys': ['domain', 'source', 'project_id', 'date']
+                'update_keys': ['domain', 'category', 'source',
+                                'project_id', 'date']
             }
         }
     }))

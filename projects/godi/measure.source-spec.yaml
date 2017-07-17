@@ -19,3 +19,10 @@ config:
       domains:
         - url: 'index.okfn.org'
           viewid: '78164875'
+
+  forum-categories:
+    discourse-categories:
+      - domain: 'discuss.okfn.org'
+        categories:
+          - name: 'open-data-index'
+            children: 'expand'
