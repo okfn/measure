@@ -3,7 +3,6 @@ import dateutil
 import os
 import unittest
 
-import simplejson
 import requests_mock
 
 from datapackage_pipelines.utilities.lib_test_helpers import (
