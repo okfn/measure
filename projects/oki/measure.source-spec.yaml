@@ -29,3 +29,8 @@ config:
     mailchimp:
       lists:
         - '32d370a7fc'
+
+  forums:
+    discourse:
+      domains:
+        - 'discuss.okfn.org'
