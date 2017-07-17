@@ -73,3 +73,10 @@ config:
     - sheetid: "13dt5OCApZsKf3tcQI7v3t_QO7tGxRk6hQd-s6RpaNKw"
       gid: "16992337"
       type: "internal"
+
+  forum-categories:
+    discourse-categories:
+      - domain: 'discuss.okfn.org'
+        categories:
+          - name: 'frictionless-data'
+            children: 'expand'
