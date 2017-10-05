@@ -1,0 +1,12 @@
+project: data-pub-workflow-toolkit
+
+config:
+
+  code-hosting:
+    github:
+      repositories:
+        - "frictionlessdata/ckanext-validation"
+        - "frictionlessdata/goodtables.io"
+        - "frictionlessdata/datapackage-ui"
+        - "frictionlessdata/tableschema-ui"
+        - "ODIQueensland/data-curator"
