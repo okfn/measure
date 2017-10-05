@@ -9,4 +9,4 @@ config:
         - "frictionlessdata/goodtables.io"
         - "frictionlessdata/datapackage-ui"
         - "frictionlessdata/tableschema-ui"
-        - "ODIQueensland/data-curator"
+        - "odiqueensland/data-curator"
