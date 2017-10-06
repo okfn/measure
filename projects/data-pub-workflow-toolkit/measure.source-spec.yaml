@@ -10,3 +10,9 @@ config:
         - "frictionlessdata/datapackage-ui"
         - "frictionlessdata/tableschema-ui"
         - "odiqueensland/data-curator"
+
+  website-analytics:
+    ga:
+      domains:
+        - url: 'goodtables.io'
+          viewid: '161960759'
