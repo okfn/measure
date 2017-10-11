@@ -10,6 +10,7 @@ config:
         - "frictionlessdata/datapackage-ui"
         - "frictionlessdata/tableschema-ui"
         - "odiqueensland/data-curator"
+        - "frictionlessdata/datapackage-pipelines-ckan"
 
   website-analytics:
     ga:
