@@ -53,7 +53,8 @@ base_repo_url = '{}/repos/{}'.format(base_url, repo)
 map_fields = {
     'repository': 'name',
     'watchers': 'subscribers_count',
-    'stars': 'stargazers_count'
+    'stars': 'stargazers_count',
+    'forks': 'forks_count'
 }
 
 repo_content = _make_github_request(base_repo_url)

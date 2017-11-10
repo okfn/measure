@@ -104,14 +104,15 @@ Below is the specific configuration settings for each type of data source.
 
 #### Github
 
-The Github processor collects data about each repository listed in the `repositories` section. For each repository, the processor collects:
+The Github processor collects data about each repository listed in the `repositories` section. For each repository, the processor collects the number of:
 
-- number of **stars**
-- number of **watchers**
-- number of **open_prs**
-- number of **closed_prs**
-- number of **open_issues**
-- number of **closed_issues**
+- **stars**
+- **watchers**
+- **forks**
+- **open_prs**
+- **closed_prs**
+- **open_issues**
+- **closed_issues**
 
 ```yaml
 config:

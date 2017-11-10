@@ -31,6 +31,7 @@ def add_steps(steps: list, pipeline_id: str,
             'open_issues': [],
             'closed_prs': [],
             'closed_issues': [],
+            'forks': [],
             'source': [],
             'date': []}
     }))
@@ -56,6 +57,9 @@ def add_steps(steps: list, pipeline_id: str,
                 'type': 'integer'
             },
             'closed_issues': {
+                'type': 'integer'
+            },
+            'forks': {
                 'type': 'integer'
             },
             'date': {

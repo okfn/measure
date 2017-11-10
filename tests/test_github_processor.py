@@ -32,6 +32,7 @@ class TestMeasureGithubProcessor(unittest.TestCase):
             'name': 'my-repository',
             'subscribers_count': 4,
             'stargazers_count': 1,
+            'forks_count': 10,
             'full_name': 'org/my_github_repo'
         }
         mock_search_response = {
@@ -72,8 +73,8 @@ class TestMeasureGithubProcessor(unittest.TestCase):
         assert dp_resources[0]['name'] == 'hello'
         field_names = \
             [field['name'] for field in dp_resources[0]['schema']['fields']]
-        assert field_names == ['repository', 'watchers', 'stars', 'source',
-                               'date', 'open_prs', 'closed_prs',
+        assert field_names == ['repository', 'watchers', 'stars', 'forks',
+                               'source', 'date', 'open_prs', 'closed_prs',
                                'open_issues', 'closed_issues']
 
         # Asserts for the res_iter
@@ -84,6 +85,7 @@ class TestMeasureGithubProcessor(unittest.TestCase):
                 'repository': 'my-repository',
                 'watchers': 4,
                 'stars': 1,
+                'forks': 10,
                 'source': 'github',
                 'date': datetime.date.today(),
                 'open_prs': 5,
