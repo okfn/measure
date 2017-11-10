@@ -27,6 +27,10 @@ def add_steps(steps: list, pipeline_id: str,
             'repository': [],
             'watchers': [],
             'stars': [],
+            'open_prs': [],
+            'open_issues': [],
+            'closed_prs': [],
+            'closed_issues': [],
             'source': [],
             'date': []}
     }))
@@ -40,6 +44,18 @@ def add_steps(steps: list, pipeline_id: str,
                 'type': 'integer'
             },
             'stars': {
+                'type': 'integer'
+            },
+            'open_prs': {
+                'type': 'integer'
+            },
+            'open_issues': {
+                'type': 'integer'
+            },
+            'closed_prs': {
+                'type': 'integer'
+            },
+            'closed_issues': {
                 'type': 'integer'
             },
             'date': {

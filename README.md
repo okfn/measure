@@ -106,8 +106,12 @@ Below is the specific configuration settings for each type of data source.
 
 The Github processor collects data about each repository listed in the `repositories` section. For each repository, the processor collects:
 
-- the number of **stars**
-- the number of **watchers**
+- number of **stars**
+- number of **watchers**
+- number of **open_prs**
+- number of **closed_prs**
+- number of **open_issues**
+- number of **closed_issues**
 
 ```yaml
 config:
@@ -118,6 +122,8 @@ config:
         - "frictionlessdata/datapackage-pipelines"
 ```
 
+
+Requesting the number of issues and pull requests uses the Github search api (four requests per repository). Search api requests are [rate limited to 30 per minute for authenticated requests](https://developer.github.com/v3/search/#rate-limit). By default, Measure will wait 3 seconds before each search request to ensure it stays within the rate limit. If you know your configurations will stay within the rate limit (fewer than 8 repositories are defined), then you can set the wait interval to `0` by using the `MEASURE_GITHUB_REQUEST_WAIT_INTERVAL` env var ([see below](#github-1)). This is not recommended.
 
 ### Code Packaging
 
@@ -468,6 +474,7 @@ Each installation of Measure requires certain environmental variables to be set.
 
 - `MEASURE_GITHUB_API_BASE_URL`: Github API base url (`https://api.github.com`)
 - `MEASURE_GITHUB_API_TOKEN`: Github API token used for making requests
+- `MEASURE_GITHUB_REQUEST_WAIT_INTERVAL`: Wait interval in seconds between Github search requests (optional, default is 3)
 
 ### Twitter
 

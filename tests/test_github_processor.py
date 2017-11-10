@@ -1,6 +1,7 @@
 import os
 import re
 import json
+import simplejson
 import datetime
 import unittest
 
@@ -30,12 +31,13 @@ class TestMeasureGithubProcessor(unittest.TestCase):
         mock_repo_response = {
             'name': 'my-repository',
             'subscribers_count': 4,
-            'stargazers_count': 1
+            'stargazers_count': 1,
+            'full_name': 'org/my_github_repo'
         }
         mock_search_response = {
             'total_count': 5
         }
-        mock_request.get('https://api.github.com/repos/my_github_repo?access_token=fake_token',  # noqa
+        mock_request.get('https://api.github.com/repos/org/my_github_repo',
                          json=mock_repo_response)
         mock_request.get('https://api.github.com/search/issues',
                          json=mock_search_response)
@@ -48,7 +50,7 @@ class TestMeasureGithubProcessor(unittest.TestCase):
         }
         params = {
             'name': 'hello',
-            'repo': 'my_github_repo'
+            'repo': 'org/my_github_repo'
         }
 
         # Path to the processor we want to test
@@ -70,8 +72,9 @@ class TestMeasureGithubProcessor(unittest.TestCase):
         assert dp_resources[0]['name'] == 'hello'
         field_names = \
             [field['name'] for field in dp_resources[0]['schema']['fields']]
-        assert field_names == ['repository', 'watchers',
-                               'stars', 'source', 'date']
+        assert field_names == ['repository', 'watchers', 'stars', 'source',
+                               'date', 'open_prs', 'closed_prs',
+                               'open_issues', 'closed_issues']
 
         # Asserts for the res_iter
         spew_res_iter_contents = list(spew_res_iter)
@@ -82,8 +85,43 @@ class TestMeasureGithubProcessor(unittest.TestCase):
                 'watchers': 4,
                 'stars': 1,
                 'source': 'github',
-                'date': datetime.date.today()
+                'date': datetime.date.today(),
+                'open_prs': 5,
+                'closed_prs': 5,
+                'open_issues': 5,
+                'closed_issues': 5
             }]
+
+    @requests_mock.mock()
+    def test_add_github_resource_processor_notjson(self, mock_request):
+        '''Github response isn't json'''
+
+        # mock the github response
+        mock_repo_response = "Hi"
+        mock_request.get('https://api.github.com/repos/org/my_github_repo',
+                         text=mock_repo_response)
+
+        # input arguments used by our mock `ingest`
+        datapackage = {
+            'name': 'my-datapackage',
+            'project': 'my-project',
+            'resources': []
+        }
+        params = {
+            'name': 'hello',
+            'repo': 'org/my_github_repo'
+        }
+
+        # Path to the processor we want to test
+        processor_dir = \
+            os.path.dirname(datapackage_pipelines_measure.processors.__file__)
+        processor_path = os.path.join(processor_dir, 'add_github_resource.py')
+
+        # Trigger the processor with our mock `ingest` and capture what it will
+        # returned to `spew`.
+        with self.assertRaises(simplejson.scanner.JSONDecodeError):
+            spew_args, _ = mock_processor_test(processor_path,
+                                               (params, datapackage, []))
 
 
 class MeasureProcessorsFixturesTest(ProcessorFixtureTestsBase):
