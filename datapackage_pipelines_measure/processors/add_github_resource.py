@@ -12,12 +12,27 @@ log = logging.getLogger(__name__)
 
 parameters, datapackage, res_iter = ingest()
 
+
+def _make_github_request(url):
+    try:
+        return requests.get(url).json()
+    except json.decoder.JSONDecodeError:
+        log.error('Expected JSON in response from: {}'.format(url))
+        raise
+
+
+def _get_issue_count_for_request(url):
+    issue_json = _make_github_request(url)
+    return issue_json['total_count']
+
+
 name = str(parameters['name'])
 repo = parameters.get('repo')
-repo_url = '{}{}?access_token={}'.format(settings['GITHUB_API_BASE_URL'],
-                                         repo,
-                                         settings['GITHUB_API_TOKEN'])
+base_url = settings['GITHUB_API_BASE_URL'].rstrip('/')
 
+# BASE REPO INFO
+base_repo_url = '{}/repos/{}?access_token={}'.format(
+    base_url, repo, settings['GITHUB_API_TOKEN'])
 # resource schema to api property names
 map_fields = {
     'repository': 'name',
@@ -25,11 +40,7 @@ map_fields = {
     'stars': 'stargazers_count'
 }
 
-try:
-    repo_content = requests.get(repo_url).json()
-except json.decoder.JSONDecodeError:
-    log.error('Expected JSON in response from: {}'.format(repo_url))
-    raise
+repo_content = _make_github_request(base_repo_url)
 
 resource_content = []
 row = {t_key: repo_content[s_key] for t_key, s_key in map_fields.items()}

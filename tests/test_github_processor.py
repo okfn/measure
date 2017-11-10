@@ -27,12 +27,18 @@ class TestMeasureGithubProcessor(unittest.TestCase):
     @requests_mock.mock()
     def test_add_github_resource_processor(self, mock_request):
         # mock the github response
-        mock_github_response = {
+        mock_repo_response = {
             'name': 'my-repository',
             'subscribers_count': 4,
             'stargazers_count': 1
         }
-        mock_request.get(requests_mock.ANY, json=mock_github_response)
+        mock_search_response = {
+            'total_count': 5
+        }
+        mock_request.get('https://api.github.com/repos/my_github_repo?access_token=fake_token',  # noqa
+                         json=mock_repo_response)
+        mock_request.get('https://api.github.com/search/issues',
+                         json=mock_search_response)
 
         # input arguments used by our mock `ingest`
         datapackage = {

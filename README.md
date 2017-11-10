@@ -466,7 +466,7 @@ Each installation of Measure requires certain environmental variables to be set.
 
 ### Github
 
-- `MEASURE_GITHUB_API_BASE_URL`: Github API base url (`https://api.github.com/repos/`)
+- `MEASURE_GITHUB_API_BASE_URL`: Github API base url (`https://api.github.com`)
 - `MEASURE_GITHUB_API_TOKEN`: Github API token used for making requests
 
 ### Twitter
