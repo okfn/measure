@@ -18,6 +18,13 @@ repo_url = '{}{}?access_token={}'.format(settings['GITHUB_API_BASE_URL'],
                                          repo,
                                          settings['GITHUB_API_TOKEN'])
 
+# resource schema to api property names
+map_fields = {
+    'repository': 'name',
+    'watchers': 'subscribers_count',
+    'stars': 'stargazers_count'
+}
+
 try:
     repo_content = requests.get(repo_url).json()
 except json.decoder.JSONDecodeError:
@@ -25,9 +32,7 @@ except json.decoder.JSONDecodeError:
     raise
 
 resource_content = []
-# remap retrieved dict to scheme in parameters
-row = {t_key: repo_content[s_key]
-       for t_key, s_key in parameters['map_fields'].items()}
+row = {t_key: repo_content[s_key] for t_key, s_key in map_fields.items()}
 row['source'] = 'github'
 row['date'] = datetime.date.today()
 

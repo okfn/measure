@@ -42,12 +42,7 @@ class TestMeasureGithubProcessor(unittest.TestCase):
         }
         params = {
             'name': 'hello',
-            'repo': 'my_github_repo',
-            'map_fields': {
-                'repository': 'name',
-                'watchers': 'subscribers_count',
-                'stars': 'stargazers_count'
-            }
+            'repo': 'my_github_repo'
         }
 
         # Path to the processor we want to test
