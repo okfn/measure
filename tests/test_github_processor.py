@@ -6,6 +6,8 @@ import datetime
 import unittest
 
 import requests_mock
+from freezegun import freeze_time
+from freezegun.api import FakeDate
 
 from datapackage_pipelines.utilities.lib_test_helpers import (
     ProcessorFixtureTestsBase,
@@ -25,6 +27,7 @@ ENV['PYTHONPATH'] = ROOT_PATH
 
 class TestMeasureGithubProcessor(unittest.TestCase):
 
+    @freeze_time("2017-10-12")
     @requests_mock.mock()
     def test_add_github_resource_processor(self, mock_request):
         # mock the github response
@@ -87,7 +90,7 @@ class TestMeasureGithubProcessor(unittest.TestCase):
                 'stars': 1,
                 'forks': 10,
                 'source': 'github',
-                'date': datetime.date.today(),
+                'date': FakeDate(2017, 10, 12),
                 'open_prs': 5,
                 'closed_prs': 5,
                 'open_issues': 5,
