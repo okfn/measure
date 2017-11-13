@@ -128,6 +128,40 @@ class TestMeasureGithubProcessor(unittest.TestCase):
             spew_args, _ = mock_processor_test(processor_path,
                                                (params, datapackage, []))
 
+    @requests_mock.mock()
+    def test_add_github_resource_processor_badstatus(self, mock_request):
+        '''Github response returns bad status'''
+
+        # mock the github response
+        mock_repo_response = {
+          "message": "API rate limit exceeded for user.",
+          "documentation_url": "https://developer.github.com/v3/#rate-limiting"
+        }
+        mock_request.get('https://api.github.com/repos/org/my_github_repo',
+                         json=mock_repo_response, status_code=403)
+
+        # input arguments used by our mock `ingest`
+        datapackage = {
+            'name': 'my-datapackage',
+            'project': 'my-project',
+            'resources': []
+        }
+        params = {
+            'name': 'hello',
+            'repo': 'org/my_github_repo'
+        }
+
+        # Path to the processor we want to test
+        processor_dir = \
+            os.path.dirname(datapackage_pipelines_measure.processors.__file__)
+        processor_path = os.path.join(processor_dir, 'add_github_resource.py')
+
+        # Trigger the processor with our mock `ingest` and capture what it will
+        # returned to `spew`.
+        with self.assertRaises(RuntimeError):
+            spew_args, _ = mock_processor_test(processor_path,
+                                               (params, datapackage, []))
+
 
 class MeasureProcessorsFixturesTest(ProcessorFixtureTestsBase):
 
