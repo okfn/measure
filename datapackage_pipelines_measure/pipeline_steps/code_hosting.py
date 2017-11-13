@@ -14,12 +14,7 @@ def add_steps(steps: list, pipeline_id: str,
     for repo in config['github']['repositories']:
         steps.append(('measure.add_github_resource', {
             'name': slugify(repo),
-            'repo': repo,
-            'map_fields': {
-                'repository': 'name',
-                'watchers': 'subscribers_count',
-                'stars': 'stargazers_count'
-            }
+            'repo': repo
         }))
 
     steps.append(('concatenate', {
@@ -32,6 +27,11 @@ def add_steps(steps: list, pipeline_id: str,
             'repository': [],
             'watchers': [],
             'stars': [],
+            'open_prs': [],
+            'open_issues': [],
+            'closed_prs': [],
+            'closed_issues': [],
+            'forks': [],
             'source': [],
             'date': []}
     }))
@@ -45,6 +45,21 @@ def add_steps(steps: list, pipeline_id: str,
                 'type': 'integer'
             },
             'stars': {
+                'type': 'integer'
+            },
+            'open_prs': {
+                'type': 'integer'
+            },
+            'open_issues': {
+                'type': 'integer'
+            },
+            'closed_prs': {
+                'type': 'integer'
+            },
+            'closed_issues': {
+                'type': 'integer'
+            },
+            'forks': {
                 'type': 'integer'
             },
             'date': {
