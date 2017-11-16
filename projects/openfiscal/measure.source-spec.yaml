@@ -32,6 +32,7 @@ config:
         - "openspending/docs"
         - "openspending/os-viewer"
         - "os-data/eu-structural-funds"
+        - "openspending/gobble"
 
   website-analytics:
     ga:
