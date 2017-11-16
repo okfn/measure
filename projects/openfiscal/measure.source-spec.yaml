@@ -34,6 +34,11 @@ config:
         - "os-data/eu-structural-funds"
         - "openspending/gobble"
 
+  code-packaging:
+    pypi:
+      packages:
+        - 'os-gobble'
+
   website-analytics:
     ga:
       domains:
