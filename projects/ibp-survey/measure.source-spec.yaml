@@ -1,0 +1,21 @@
+project: ibp-survey
+
+config:
+
+  social-media:
+    twitter:
+      entities:
+        - "#openbudgetsurvey"
+        - "url:survey.internationalbudget.org"
+
+  code-hosting:
+    github:
+      repositories:
+        - "okfn/ibp-explorer"
+        - "okfn/ibp-explorer-data-client"
+
+  website-analytics:
+    ga:
+      domains:
+        - url: 'survey.internationalbudget.org'
+          viewid: '68259881'
