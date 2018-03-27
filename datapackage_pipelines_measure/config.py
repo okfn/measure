@@ -1,11 +1,7 @@
 from distutils.util import strtobool
 import os
 import collections
-
-try:
-    from .settings_dev import *  # noqa
-except ImportError:
-    pass
+from dotenv import load_dotenv
 
 
 NAMESPACE = 'MEASURE_'
@@ -49,4 +45,5 @@ class Config(collections.MutableMapping):
         del self.store[key]
 
 
+load_dotenv()
 settings = Config(os.environ.items(), NAMESPACE)
