@@ -20,6 +20,7 @@ NAME = PACKAGE.replace('_', '-')
 INSTALL_REQUIRES = [
     'datapackage-pipelines==1.0.19',
     'psycopg2',
+    'python-dotenv',
     'tweepy',
     'facebook-sdk',
     'google-api-python-client==1.5.3',
