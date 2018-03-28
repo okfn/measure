@@ -68,6 +68,8 @@ config:
           viewid: '120195554'
         - url: 'specs.frictionlessdata.io'
           viewid: '57520245'
+        - url: 'goodtables.io'
+          viewid: '161960759'
 
   outputs:
     - sheetid: "13dt5OCApZsKf3tcQI7v3t_QO7tGxRk6hQd-s6RpaNKw"
