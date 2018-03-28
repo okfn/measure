@@ -16,15 +16,14 @@ python:
   - 3.6
 
 env:
-  global:
-    - TOXENV="py${PYTHON_VERSION//./}"
+  - TOXENV="py${PYTHON_VERSION//./}"
+  - TOXENV=lint
 
 install:
-  - make install
-  - pip install coveralls
+  - pip install tox coveralls
 
 script:
-  - make test
+  - tox
 
 after_success:
   - coveralls
