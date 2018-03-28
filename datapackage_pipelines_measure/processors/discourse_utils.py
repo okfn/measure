@@ -2,6 +2,7 @@ import datetime
 import dateutil
 import urllib
 import functools
+import time
 
 import requests
 import simplejson
@@ -23,7 +24,11 @@ def request_data_from_discourse(domain, endpoint, **kwargs):
         ('https', domain, endpoint, None, qs, None)
     )
     response = requests.get(url)
-    if response.status_code != 200:
+    if response.status_code == 429:
+        # Too Many Requests
+        time.sleep(30)
+        return request_data_from_discourse(domain, endpoint, **kwargs)
+    elif response.status_code != 200:
         raise ValueError(
             'Error raised for domain:{}, '
             'Status code:{}. '
