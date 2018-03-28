@@ -33,6 +33,12 @@ def _request_data_from_ga(domain, view_id, start_date, end_date):
                     "dimensions": [
                         {
                             "name": "ga:date"
+                        },
+                        {
+                            "name": "ga:hostname"
+                        },
+                        {
+                            "name": "ga:pagePath"
                         }
                     ],
                     "metrics": [
@@ -100,8 +106,9 @@ def ga_collector(domain, view_id, latest_date):
         metrics = row['metrics'][0]['values']
         res_row = {
             'source': 'ga',
-            'domain': domain,
+            'domain': row['dimensions'][1],
             'date': dateutil.parser.parse(row['dimensions'][0]).date(),
+            'page_path': row['dimensions'][2],
             'visitors': int(metrics[0]),
             'unique_visitors': int(metrics[1]),
             'avg_time_spent': round(float(metrics[2]))
@@ -121,7 +128,7 @@ resource = {
 }
 
 headers = ['domain', 'source', 'date', 'visitors', 'unique_visitors',
-           'avg_time_spent']
+           'avg_time_spent', 'page_path']
 resource['schema'] = {'fields': [{'name': h, 'type': 'string'}
                                  for h in headers]}
 
