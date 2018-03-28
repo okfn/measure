@@ -14,7 +14,7 @@ def add_steps(steps: list, pipeline_id: str,
         'resource-name': 'latest-project-entries',
         'table': 'websiteanalytics',
         'engine': settings.get('DB_ENGINE'),
-        'distinct_on': ['project_id', 'domain', 'source']
+        'distinct_on': ['project_id', 'domain', 'page_path', 'source']
     }))
 
     if 'ga' in config:
@@ -33,6 +33,7 @@ def add_steps(steps: list, pipeline_id: str,
             'path': 'data/website-analytics.json'},
         'fields': {
             'domain': [],
+            'page_path': [],
             'visitors': [],
             'unique_visitors': [],
             'avg_time_spent': [],
@@ -43,6 +44,9 @@ def add_steps(steps: list, pipeline_id: str,
     steps.append(('set_types', {
         'types': {
             'domain': {
+                'type': 'string',
+            },
+            'page_path': {
                 'type': 'string',
             },
             'visitors': {
@@ -76,7 +80,13 @@ def add_steps(steps: list, pipeline_id: str,
             'websiteanalytics': {
                 'resource-name': 'website-analytics',
                 'mode': 'update',
-                'update_keys': ['domain', 'source', 'project_id', 'date']
+                'update_keys': [
+                    'domain',
+                    'page_path',
+                    'source',
+                    'project_id',
+                    'date',
+                ]
             }
         }
     }))

@@ -1,7 +1,7 @@
 import os
 import mock
 import dateutil
-import unittest
+import pytest
 
 from datapackage_pipelines.utilities.lib_test_helpers import (
     mock_processor_test
@@ -13,37 +13,11 @@ import logging
 log = logging.getLogger(__name__)
 
 
-class TestMeasureGAProcessor(unittest.TestCase):
+class TestMeasureGAProcessor(object):
 
-    @mock.patch(
-        'datapackage_pipelines_measure.processors.google_utils.discovery')
-    def test_add_ga_resource_processor_no_latest(self, mock_discovery):
+    @pytest.mark.usefixtures('full_ga_response')
+    def test_add_ga_resource_processor_no_latest(self):
         '''No latest in db, so populate from GA request.'''
-
-        ga_response = {
-            'reports': [
-                {
-                    'data': {
-                        'rows': [
-                            {'dimensions': ['20170515'],
-                             'metrics': [{'values': ['1', '1', '2.0']}]},
-                            {'dimensions': ['20170516'],
-                             'metrics': [{'values': ['3', '5', '8.0']}]},
-                            {'dimensions': ['20170517'],
-                             'metrics': [{'values': ['13', '21', '34.0']}]},
-                            {'dimensions': ['20170518'],
-                             'metrics': [{'values': ['55', '89', '144.0']}]}
-                        ]
-                    }
-                }
-            ]
-        }
-
-        mock_discovery \
-            .build.return_value \
-            .reports.return_value \
-            .batchGet.return_value \
-            .execute.return_value = ga_response
 
         # input arguments used by our mock `ingest`
         datapackage = {
@@ -81,6 +55,7 @@ class TestMeasureGAProcessor(unittest.TestCase):
         # first row asserts
         assert rows[0] == {
             'date': dateutil.parser.parse('2017-05-15').date(),
+            'page_path': '/',
             'visitors': 1,
             'unique_visitors': 1,
             'avg_time_spent': 2,
@@ -94,35 +69,9 @@ class TestMeasureGAProcessor(unittest.TestCase):
         assert rows[len(rows)-1]['date'] == \
             dateutil.parser.parse('2017-05-18').date()
 
-    @mock.patch(
-        'datapackage_pipelines_measure.processors.google_utils.discovery')
-    def test_add_ga_resource_processor_latest_week_old(self, mock_discovery):
+    @pytest.mark.usefixtures('full_ga_response')
+    def test_add_ga_resource_processor_latest_week_old(self):
         '''Latest in db is a week old, so fetch new data.'''
-
-        ga_response = {
-            'reports': [
-                {
-                    'data': {
-                        'rows': [
-                            {'dimensions': ['20170515'],
-                             'metrics': [{'values': ['1', '1', '2.0']}]},
-                            {'dimensions': ['20170516'],
-                             'metrics': [{'values': ['3', '5', '8.0']}]},
-                            {'dimensions': ['20170517'],
-                             'metrics': [{'values': ['13', '21', '34.0']}]},
-                            {'dimensions': ['20170518'],
-                             'metrics': [{'values': ['55', '89', '144.0']}]}
-                        ]
-                    }
-                }
-            ]
-        }
-
-        mock_discovery \
-            .build.return_value \
-            .reports.return_value \
-            .batchGet.return_value \
-            .execute.return_value = ga_response
 
         # input arguments used by our mock `ingest`
         datapackage = {
@@ -136,6 +85,7 @@ class TestMeasureGAProcessor(unittest.TestCase):
                         {'name': 'visitors', 'type': 'int'},
                         {'name': 'unique_visitors', 'type': 'int'},
                         {'name': 'domain', 'type': 'string'},
+                        {'name': 'page_path', 'type': 'string'},
                         {'name': 'avg_time_spent', 'type': 'number'},
                         {'name': 'source', 'type': 'string'},
                     ]
@@ -152,6 +102,7 @@ class TestMeasureGAProcessor(unittest.TestCase):
         def latest_entries_res():
             yield {
                     'date': dateutil.parser.parse('2017-05-14').date(),
+                    'page_path': '/',
                     'visitors': 3,
                     'unique_visitors': 5,
                     'avg_time_spent': 12,
@@ -187,6 +138,7 @@ class TestMeasureGAProcessor(unittest.TestCase):
         # first row asserts
         assert rows[0] == {
             'date': dateutil.parser.parse('2017-05-15').date(),
+            'page_path': '/',
             'visitors': 1,
             'unique_visitors': 1,
             'avg_time_spent': 2,
@@ -200,24 +152,9 @@ class TestMeasureGAProcessor(unittest.TestCase):
         assert rows[len(rows)-1]['date'] == \
             dateutil.parser.parse('2017-05-18').date()
 
-    @mock.patch(
-        'datapackage_pipelines_measure.processors.google_utils.discovery')
-    def test_add_ga_resource_processor_no_row_returned(self, mock_discovery):
+    @pytest.mark.usefixtures('empty_ga_response')
+    def test_add_ga_resource_processor_no_row_returned(self):
         '''No rows returned from GA response.'''
-
-        ga_response = {
-            'reports': [
-                {
-                    'data': {}
-                }
-            ]
-        }
-
-        mock_discovery \
-            .build.return_value \
-            .reports.return_value \
-            .batchGet.return_value \
-            .execute.return_value = ga_response
 
         # input arguments used by our mock `ingest`
         datapackage = {
@@ -253,3 +190,51 @@ class TestMeasureGAProcessor(unittest.TestCase):
         # rows in resource
         rows = list(resources)[0]
         assert len(rows) == 0
+
+
+
+@pytest.fixture
+def full_ga_response():
+    ga_response = {
+        'reports': [
+            {
+                'data': {
+                    'rows': [
+                        {'dimensions': ['20170515', 'sub.example.com', '/'],
+                         'metrics': [{'values': ['1', '1', '2.0']}]},
+                        {'dimensions': ['20170516', 'sub.example.com', '/'],
+                         'metrics': [{'values': ['3', '5', '8.0']}]},
+                        {'dimensions': ['20170517', 'sub.example.com', '/'],
+                         'metrics': [{'values': ['13', '21', '34.0']}]},
+                        {'dimensions': ['20170518', 'sub.example.com', '/'],
+                         'metrics': [{'values': ['55', '89', '144.0']}]}
+                    ]
+                }
+            }
+        ]
+    }
+
+    yield from _mock_google_utils(ga_response)
+
+
+@pytest.fixture
+def empty_ga_response():
+    ga_response = {
+        'reports': [
+            {
+                'data': {}
+            }
+        ]
+    }
+
+    yield from _mock_google_utils(ga_response)
+
+
+def _mock_google_utils(ga_response):
+    with mock.patch('datapackage_pipelines_measure.processors.google_utils.discovery') as mock_discovery:
+       mock_discovery \
+           .build.return_value \
+           .reports.return_value \
+           .batchGet.return_value \
+           .execute.return_value = ga_response
+       yield mock_discovery
