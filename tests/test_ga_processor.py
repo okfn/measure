@@ -60,7 +60,8 @@ class TestMeasureGAProcessor(object):
             'unique_visitors': 1,
             'avg_time_spent': 2,
             'domain': 'sub.example.com',
-            'source': 'ga'
+            'source': 'ga',
+            'pageviews': 100,
         }
         # last row asserts
         assert rows[len(rows)-1]['visitors'] == 55
@@ -88,6 +89,7 @@ class TestMeasureGAProcessor(object):
                         {'name': 'page_path', 'type': 'string'},
                         {'name': 'avg_time_spent', 'type': 'number'},
                         {'name': 'source', 'type': 'string'},
+                        {'name': 'pageviews', 'type': 'int'},
                     ]
                 }
             }]
@@ -107,7 +109,8 @@ class TestMeasureGAProcessor(object):
                     'unique_visitors': 5,
                     'avg_time_spent': 12,
                     'domain': 'sub.example.com',
-                    'source': 'ga'
+                    'source': 'ga',
+                    'pageviews': 100,
                 }
 
         # Path to the processor we want to test
@@ -143,7 +146,8 @@ class TestMeasureGAProcessor(object):
             'unique_visitors': 1,
             'avg_time_spent': 2,
             'domain': 'sub.example.com',
-            'source': 'ga'
+            'source': 'ga',
+            'pageviews': 100,
         }
         # last row asserts
         assert rows[len(rows)-1]['visitors'] == 55
@@ -192,7 +196,6 @@ class TestMeasureGAProcessor(object):
         assert len(rows) == 0
 
 
-
 @pytest.fixture
 def full_ga_response():
     ga_response = {
@@ -201,13 +204,13 @@ def full_ga_response():
                 'data': {
                     'rows': [
                         {'dimensions': ['20170515', 'sub.example.com', '/'],
-                         'metrics': [{'values': ['1', '1', '2.0']}]},
+                         'metrics': [{'values': ['1', '1', '2.0', '100']}]},
                         {'dimensions': ['20170516', 'sub.example.com', '/'],
-                         'metrics': [{'values': ['3', '5', '8.0']}]},
+                         'metrics': [{'values': ['3', '5', '8.0', '120']}]},
                         {'dimensions': ['20170517', 'sub.example.com', '/'],
-                         'metrics': [{'values': ['13', '21', '34.0']}]},
+                         'metrics': [{'values': ['13', '21', '34.0', '30']}]},
                         {'dimensions': ['20170518', 'sub.example.com', '/'],
-                         'metrics': [{'values': ['55', '89', '144.0']}]}
+                         'metrics': [{'values': ['55', '89', '144.0', '50']}]}
                     ]
                 }
             }
@@ -232,9 +235,9 @@ def empty_ga_response():
 
 def _mock_google_utils(ga_response):
     with mock.patch('datapackage_pipelines_measure.processors.google_utils.discovery') as mock_discovery:
-       mock_discovery \
-           .build.return_value \
-           .reports.return_value \
-           .batchGet.return_value \
-           .execute.return_value = ga_response
-       yield mock_discovery
+        mock_discovery \
+            .build.return_value \
+            .reports.return_value \
+            .batchGet.return_value \
+            .execute.return_value = ga_response
+        yield mock_discovery

@@ -38,7 +38,9 @@ def add_steps(steps: list, pipeline_id: str,
             'unique_visitors': [],
             'avg_time_spent': [],
             'source': [],
-            'date': []}
+            'date': [],
+            'pageviews': [],
+        }
     }))
 
     steps.append(('set_types', {
@@ -60,6 +62,9 @@ def add_steps(steps: list, pipeline_id: str,
             },
             'date': {
                 'type': 'date',
+            },
+            'pageviews': {
+                'type': 'integer',
             },
         }
     }))

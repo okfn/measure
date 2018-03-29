@@ -50,7 +50,10 @@ def _request_data_from_ga(domain, view_id, start_date, end_date):
                         },
                         {
                             "expression": "ga:avgSessionDuration"
-                        }
+                        },
+                        {
+                            "expression": "ga:pageviews"
+                        },
                     ],
                     "pageSize": "10000"
                 }
@@ -111,7 +114,8 @@ def ga_collector(domain, view_id, latest_date):
             'page_path': row['dimensions'][2],
             'visitors': int(metrics[0]),
             'unique_visitors': int(metrics[1]),
-            'avg_time_spent': round(float(metrics[2]))
+            'avg_time_spent': round(float(metrics[2])),
+            'pageviews': int(metrics[3]),
         }
         resource_content.append(res_row)
 
@@ -128,7 +132,7 @@ resource = {
 }
 
 headers = ['domain', 'source', 'date', 'visitors', 'unique_visitors',
-           'avg_time_spent', 'page_path']
+           'avg_time_spent', 'page_path', 'pageviews']
 resource['schema'] = {'fields': [{'name': h, 'type': 'string'}
                                  for h in headers]}
 
