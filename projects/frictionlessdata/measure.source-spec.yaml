@@ -60,6 +60,10 @@ config:
         - "frictionlessdata/datapackage-r"
         - "frictionlessdata/datapackagist"
         - "frictionlessdata/goodtables-js"
+        - "frictionlessdata/ckanext-validation"
+        - "frictionlessdata/datapackage-pipelines-ckan"
+        - "frictionlessdata/tableschema-ui"
+        - "ODIQueensland/data-curator"
 
   website-analytics:
     ga:
