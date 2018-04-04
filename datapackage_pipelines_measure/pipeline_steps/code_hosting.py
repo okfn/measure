@@ -13,7 +13,7 @@ def add_steps(steps: list, pipeline_id: str,
               project_id: str, config: dict) -> list:
     for repo in config['github']['repositories']:
         steps.append(('measure.add_github_resource', {
-            'name': slugify(repo),
+            'name': slugify(repo).lower(),
             'repo': repo
         }))
 
