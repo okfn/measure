@@ -52,7 +52,7 @@ def _request_data_from_ga(domain, view_id, start_date, end_date):
                             "expression": "ga:avgSessionDuration"
                         }
                     ],
-                    "pageSize": "10000"
+                    "pageSize": "1000000"
                 }
             ]
         }
