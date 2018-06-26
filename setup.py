@@ -47,6 +47,7 @@ setup(
     extras_require={'develop': TESTS_REQUIRE},
     zip_safe=False,
     long_description=README,
+    long_description_content_type="text/markdown",
     description='{{ DESCRIPTION }}',
     author='Open Knowledge International',
     author_email='info@okfn.org',
