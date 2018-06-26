@@ -46,7 +46,7 @@ class Generator(GeneratorBase):
         return json.load(open(SCHEMA_FILE))
 
     @classmethod
-    def generate_pipeline(cls, source):
+    def generate_pipeline(cls, source, base):
         project_id = slugify(source['project'])
         schedule = SCHEDULE_DAILY
 
