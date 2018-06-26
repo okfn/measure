@@ -8,3 +8,5 @@ tests/
 .dpp.db
 downloads/
 measure.sublime-project
+.env
+.coverage
