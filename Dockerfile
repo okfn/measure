@@ -1,4 +1,4 @@
-FROM frictionlessdata/datapackage-pipelines:latest
+FROM frictionlessdata/datapackage-pipelines:1.7.1
 
 RUN apk add --update postgresql-client
 
