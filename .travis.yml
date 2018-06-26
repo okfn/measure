@@ -4,11 +4,6 @@ sudo:
 dist:
   trusty
 
-addons:
-  apt:
-    packages:
-      - pandoc
-
 language:
   python
 
@@ -27,11 +22,6 @@ script:
 
 after_success:
   - coveralls
-
-before_deploy:
-  - pandoc --version
-  - pandoc -f markdown_github -t rst -o README.rst README.md
-  - mv README.rst README.md
 
 deploy:
   provider: pypi
