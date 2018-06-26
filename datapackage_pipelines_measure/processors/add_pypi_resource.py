@@ -3,6 +3,7 @@ import dateutil
 
 from datapackage_pipelines.generators import slugify
 from datapackage_pipelines.wrapper import ingest, spew
+from datapackage_pipelines.utilities.resources import PROP_STREAMING
 
 from datapackage_pipelines_measure.processors import google_utils
 from datapackage_pipelines_measure.config import settings
@@ -118,7 +119,8 @@ parameters, datapackage, res_iter = ingest()
 package = parameters['package']
 resource = {
     'name': slugify(package),
-    'path': 'data/{}.csv'.format(slugify(package))
+    'path': 'data/{}.csv'.format(slugify(package)),
+    PROP_STREAMING: True
 }
 
 headers = ['package', 'source', 'date', 'downloads']

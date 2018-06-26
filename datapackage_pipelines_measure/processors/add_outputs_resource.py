@@ -5,6 +5,7 @@ import urllib
 
 from datapackage_pipelines.generators import slugify
 from datapackage_pipelines.wrapper import ingest, spew
+from datapackage_pipelines.utilities.resources import PROP_STREAMING
 
 from datapackage_pipelines_measure.processors import google_utils
 
@@ -125,7 +126,8 @@ source_type = parameters['source_type']
 source_id = '{0}/{1}'.format(sheet_id, gid)
 resource = {
     'name': slugify(sheet_id).lower(),
-    'path': 'data/{}.csv'.format(slugify(sheet_id))
+    'path': 'data/{}.csv'.format(slugify(sheet_id)),
+    PROP_STREAMING: True
 }
 
 headers = ['source', 'source_type', 'source_timestamp', 'source_email',

@@ -9,6 +9,7 @@ from requests.auth import HTTPBasicAuth
 
 from datapackage_pipelines.generators import slugify
 from datapackage_pipelines.wrapper import ingest, spew
+from datapackage_pipelines.utilities.resources import PROP_STREAMING
 
 from datapackage_pipelines_measure.config import settings
 
@@ -155,7 +156,8 @@ parameters, datapackage, res_iter = ingest()
 list_id = parameters['list_id']
 resource = {
     'name': slugify(list_id),
-    'path': 'data/{}.csv'.format(slugify(list_id))
+    'path': 'data/{}.csv'.format(slugify(list_id)),
+    PROP_STREAMING: True
 }
 
 headers = ['source', 'date', 'list_id', 'subs', 'unsubs', 'subscribers',

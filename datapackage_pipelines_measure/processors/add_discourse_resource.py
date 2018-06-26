@@ -3,6 +3,7 @@ import datetime
 
 from datapackage_pipelines.generators import slugify
 from datapackage_pipelines.wrapper import ingest, spew
+from datapackage_pipelines.utilities.resources import PROP_STREAMING
 
 from datapackage_pipelines_measure.processors.discourse_utils import (
     request_data_from_discourse,
@@ -99,7 +100,8 @@ parameters, datapackage, res_iter = ingest()
 domain = parameters['domain']
 resource = {
     'name': slugify(domain),
-    'path': 'data/{}.csv'.format(slugify(domain))
+    'path': 'data/{}.csv'.format(slugify(domain)),
+    PROP_STREAMING: True
 }
 
 headers = ['domain', 'source', 'date', 'new_users', 'new_topics',

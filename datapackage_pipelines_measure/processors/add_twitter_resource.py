@@ -7,6 +7,7 @@ import tweepy
 
 from datapackage_pipelines.generators import slugify
 from datapackage_pipelines.wrapper import ingest, spew
+from datapackage_pipelines.utilities.resources import PROP_STREAMING
 
 from datapackage_pipelines_measure.config import settings
 
@@ -192,7 +193,8 @@ project_id = parameters['project_id']
 safe_entity = _get_safe_entity(entity)
 resource = {
     'name': safe_entity,
-    'path': 'data/{}.csv'.format(safe_entity)
+    'path': 'data/{}.csv'.format(safe_entity),
+    PROP_STREAMING: True
 }
 
 entity_type = _get_entity_type(entity)

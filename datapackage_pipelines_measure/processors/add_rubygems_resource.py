@@ -5,6 +5,7 @@ import requests
 
 from datapackage_pipelines.generators import slugify
 from datapackage_pipelines.wrapper import ingest, spew
+from datapackage_pipelines.utilities.resources import PROP_STREAMING
 
 import logging
 log = logging.getLogger(__name__)
@@ -73,7 +74,8 @@ parameters, datapackage, res_iter = ingest()
 gem_id = parameters['gem_id']
 resource = {
     'name': slugify(gem_id),
-    'path': 'data/{}.csv'.format(slugify(gem_id))
+    'path': 'data/{}.csv'.format(slugify(gem_id)),
+    PROP_STREAMING: True
 }
 
 headers = ['source', 'date', 'package', 'downloads', 'total_downloads']

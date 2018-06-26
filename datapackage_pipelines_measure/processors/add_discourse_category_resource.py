@@ -2,6 +2,7 @@ import collections
 
 from datapackage_pipelines.generators import slugify
 from datapackage_pipelines.wrapper import ingest, spew
+from datapackage_pipelines.utilities.resources import PROP_STREAMING
 
 from datapackage_pipelines_measure.processors.discourse_utils import (
     request_report_from_discourse,
@@ -99,7 +100,8 @@ child_treatment = parameters['category'].get('children', None)
 
 resource = {
     'name': slugify(domain),
-    'path': 'data/{}.csv'.format(slugify(domain))
+    'path': 'data/{}.csv'.format(slugify(domain)),
+    PROP_STREAMING: True
 }
 
 headers = ['domain', 'category', 'source', 'date', 'new_topics', 'new_posts']

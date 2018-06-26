@@ -7,6 +7,7 @@ import facebook as facebook_sdk
 
 from datapackage_pipelines.generators import slugify
 from datapackage_pipelines.wrapper import ingest, spew
+from datapackage_pipelines.utilities.resources import PROP_STREAMING
 
 from datapackage_pipelines_measure.config import settings
 
@@ -200,7 +201,8 @@ entity = parameters['entity']
 safe_entity = slugify(entity).lower()
 resource = {
     'name': safe_entity,
-    'path': 'data/{}.csv'.format(safe_entity)
+    'path': 'data/{}.csv'.format(safe_entity),
+    PROP_STREAMING: True
 }
 entity_type = 'page'
 

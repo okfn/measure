@@ -1,6 +1,7 @@
 import itertools
 
 from datapackage_pipelines.wrapper import ingest, spew
+from datapackage_pipelines.utilities.resources import PROP_STREAMING
 
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
@@ -49,7 +50,8 @@ else:
 
     resource = {
         'name': resource_name,
-        'path': 'data/{}.csv'.format(resource_name)
+        'path': 'data/{}.csv'.format(resource_name),
+        PROP_STREAMING: True
     }
 
     # Temporarily set all types to string.

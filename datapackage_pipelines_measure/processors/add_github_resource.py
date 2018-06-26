@@ -5,6 +5,7 @@ import time
 
 import requests
 from datapackage_pipelines.wrapper import ingest, spew
+from datapackage_pipelines.utilities.resources import PROP_STREAMING
 
 from datapackage_pipelines_measure.config import settings
 
@@ -82,7 +83,8 @@ row['closed_issues'] = _get_issue_count_for_request(
 
 resource = {
     'name': name,
-    'path': 'data/{}.csv'.format(name)
+    'path': 'data/{}.csv'.format(name),
+    PROP_STREAMING: True
 }
 
 # Temporarily set all types to string, will use `set_types` processor in
