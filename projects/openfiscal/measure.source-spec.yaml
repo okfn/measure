@@ -44,7 +44,5 @@ config:
       domains:
         - url: 'community.openspending.org'
           viewid: '74190894'
-        - url: 'openspending.org'
-          viewid: '44042637'
         - url: 'next.openspending.org'
           viewid: '131861793'

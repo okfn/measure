@@ -25,6 +25,7 @@ def _get_active_users_number_last_24_hrs(domain):
         '''Request active users by page until an empty array is return, or we
         reach a user created after the last 24hr'''
         current_page = 1  # /admin/users/list paging starts at one
+        day_in_seconds = 24 * 60 * 60
         while True:
             users = _request_users_from_discourse(domain, 'active',
                                                   current_page)
@@ -32,7 +33,7 @@ def _get_active_users_number_last_24_hrs(domain):
                 raise StopIteration
             current_page = current_page + 1
             for user in users:
-                if not user['last_seen_age'].endswith(('h', 'm')):
+                if user['last_seen_age'] > day_in_seconds:
                     raise StopIteration
                 yield user
 

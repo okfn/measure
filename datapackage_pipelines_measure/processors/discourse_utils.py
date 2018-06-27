@@ -38,7 +38,7 @@ def request_data_from_discourse(domain, endpoint, **kwargs):
 
     try:
         json_response = response.json()
-    except simplejson.scanner.JSONDecodeError as e:
+    except simplejson.scanner.JSONDecodeError:
         log.error('Expected JSON in response from: {}'.format(url))
         raise ValueError('Expected JSON in response from: {}'.format(url))
 

@@ -14,12 +14,13 @@ def add_steps(steps: list, pipeline_id: str,
     for repo in config['github']['repositories']:
         steps.append(('measure.add_github_resource', {
             'name': slugify(repo).lower(),
-            'repo': repo
+            'repo': repo.lower()
         }))
 
     steps.append(('concatenate', {
         'sources':
-            [slugify(repo) for repo in config['github']['repositories']],
+            [slugify(repo).lower()
+             for repo in config['github']['repositories']],
         'target': {
             'name': 'code-hosting',
             'path': 'data/code-hosting.json'},

@@ -38,12 +38,13 @@ RESTRICTED_REPORT_RESPONSE = {
 }
 
 ACTIVE_USERS_RESPONSE = [
-    {'json': [{'last_seen_age': '3m'},
-              {'last_seen_age': '45h'},
-              {'last_seen_age': '2h'}], 'status_code': 200},
-    {'json': [{'last_seen_age': '3h'},
-              {'last_seen_age': '1d'},
-              {'last_seen_age': '25d'}], 'status_code': 200},
+    {'json': [{'last_seen_age': 3 * 60},  # 3 mins
+              {'last_seen_age': 23 * 60 * 60},  # 23hr
+              {'last_seen_age': 2 * 60 * 60}], 'status_code': 200},  # 2hrs
+    {'json': [{'last_seen_age': 3 * 60 * 60},  # 3hrs
+              {'last_seen_age': (24 * 60 * 60) + 1},  # 24hrs + 1 sec
+              {'last_seen_age': 25 * 24 * 60 * 60}],  # 25d
+        'status_code': 200},
     {'json': [], 'status_code': 200},
 ]
 

@@ -63,7 +63,7 @@ config:
         - "frictionlessdata/ckanext-validation"
         - "frictionlessdata/datapackage-pipelines-ckan"
         - "frictionlessdata/tableschema-ui"
-        - "ODIQueensland/data-curator"
+        - "odiqueensland/data-curator"
 
   website-analytics:
     ga:

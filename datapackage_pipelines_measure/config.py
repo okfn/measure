@@ -1,7 +1,7 @@
 from distutils.util import strtobool
 import os
 import collections
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 
 
 NAMESPACE = 'MEASURE_'
@@ -45,5 +45,5 @@ class Config(collections.MutableMapping):
         del self.store[key]
 
 
-load_dotenv()
+load_dotenv(find_dotenv())
 settings = Config(os.environ.items(), NAMESPACE)
