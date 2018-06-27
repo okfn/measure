@@ -48,4 +48,4 @@ ci-push-tag: ci-login
 	docker push ${REPO}:${TAG}
 
 ci-login:
-	docker login -u ${DOCKER_HUB_USERNAME} -p ${DOCKER_HUB_PASSWORD}
+	docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
