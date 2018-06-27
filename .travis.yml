@@ -1,33 +1,31 @@
-sudo:
-  required
-
-dist:
-  trusty
-
-language:
-  python
-
+sudo: required
+dist: trusty
+language: python
+services:
+- docker
 python:
-  - 3.6
-
+- 3.6
 env:
+  global:
   - TOXENV="py${PYTHON_VERSION//./}"
   - TOXENV=lint
-
+  - secure: TZRLIZOOec7S8p/hq1izbP832NCjd902hBWwdR1GgO5e++IWV/NaOm4pMR1ZPyFleFKhP9/acMGRGTnKZ13rTshmKy9rN2K3RTU/v/451uOBe+VlgTdCOubyMecSEc7laK0sv7RsQgNVbfUN4bfoO37lXbaCzgkle08N6odGS7KeD+PmndV3MwMPCLs/pJnxEFKFw84GnG1qne6hPV3izYp0ptLmHO/HzfSRIpnCOpvfGX+PRCg6nnvVnhM7xnGe0rjIggBUBXWYhgSY2ee/2S7sX5K06HD04QXJgtp+vi1vDC7A5OzRlIv0zX89tR7pTINIVDlwCcuvSMG2Q7JxcpJnh7z62wSzFuG7M2GI8G1SJYYjvPL3p3euJAc2b1vUcEZgKSNfs07M0WgRMCnI8v30ydDzvlZucrKTuDLXcYfiL8y9ju1tjAcqeTlfh93wKnd0+9+tWnRaRKCoxSeHm1pvkXdM0U1KBm5VJoLZ/EMn62IoP4dJV9ydOXcCpam9aqlDNetPCH3+MzpOIvvaMJfcMXlc3I+NqrC/dwFG2poOwbdjWYvZ/BzLXK5VmlAWiOKI0Mg4N3rqMchg4YAfSrqL2/pilzwXK2AHZkA35Mj1oAWEL85mQAavNcuoeECV25X88m0KJgxIe0yyk/aTITFVmvrV5VUaQXF78Otc/zc=
+  - secure: exEayoay9uX2NhsjxOgpLlBZuM0RjzheZjh+xJyX/Z+eOUJAN4JkaOp4NNzDlwhFmJ8rOk+V+wRx9LjnoW9E8pq86TUL8lRSi39VECuzRL1M5a7Arel+CNtctJR6rZpCsOfdfDE4dh1O0q+YdHgyloSxy5Cowl8Ssmc126vyeqCuIJk1VcsIkew9sWNjOQ0u8ZdgqPNwFJUhzRAN7YSZnX2oXwgINO4NDQNgZ4SQX8wAB1gzqp/2YuwIHNySgFjCrz58OwywoxuVuGOGJtV1QRiAqAAyEuZTG0jxvg/Nb8YucqJhEAcs3/gRnvjWoZHyghsStnDdXoKy7bIx8WkARlDMUqsQwniKrjDpjOaHER0q/xYExwZ3w43uuBxNKYZrIxov3ZeINdSeYz1D1BNEgVeZNWn2xt0ceAEReIJ69LSGga5i5TYUmeNegqoRrnIu3iyteu0tkEwrcY+/vec9npu97MYyCSwMDmlRPPzM+hsmghTfe+cYlVbuifzed5mVz47lBLcD0l29YqIqhCYhEZSeqARYZB+7YFuFvjPD0Y99CgO2FKWRr8PXYl4NoJtjK1vHSWFtKLqOqSgz4vveK4qt2BbY6M2N7cuL+gzJ2gJ0ew/Rw5wJlQxoFNzhNVswjIG3jvFXflLX4s03d7B8s7iRbYrTBAf/36AGZMbMj3k=
 install:
-  - pip install tox coveralls
-
+- pip install tox coveralls
 script:
-  - tox
-
+- tox
 after_success:
-  - coveralls
-
+- coveralls
 deploy:
-  provider: pypi
+- provider: pypi
   user: okfn
   distributions: sdist bdist_wheel
   on:
     tags: true
   password:
     secure: Iuf7V4+XHL6wwFYt4IyEe0vWLGO/uOpMJWQnO+1eUjmcQ1qi4E9vyEJvsJRzWKm5+/Lv9uFIRGlmpNWQzUPs5VnMc3LEBh7Clv/WIlRGvi+omCeWoEPAPUueF8qjBcvpT37QNzjB5QXJY074uAihmKh/DU2xA4K0yCB8YQefBHYeNBl0pNYVnELUW8BFmz0GE0lTwHOnM681vgR01LdPjrgIHVEvnTZkKYtDXc/cwkw610fqrFS10srnTX6KjjC/pgDm4WSuaUxbPycmriIhZR29QgAx24NO/wrdGdp5H8TIsvBFnNFlC4QuHfwiXdAKpjL6cMu2uMo639Sev/484XxTorg2QQvNhNAJtiESVAaqVviAlmUItGdmsw4xhZb0JK6NC8fOuOoccL4DBD6JtCyGurwSpznuGXh1DQUYZ7fTd5qaUDnzBuhYGc8XDvcj14XU4P5OKES4NdruRVJOwFiNSMOAT6wm8b2Ue6N+FvgsghjwUr9ESKBrPj0VoouC2+FGZWT65vt/3R9PhFuBdC6SgMLWHESBuU5GW9Bc2ucS3HUi+uUV1IGjpfIsc3qifojNJiaU7hSAggJs9QlXd7goH2fKhb9ro2klzcDKmpBLXmMk3uH0QRpv1dGUYFtgGeEFN93vP3cxYsXf8OvV+MuCxYYGgrGZu3h8fvbc5hY=
+- provider: script
+  script: make ci-push
+  on:
+    branch: master
