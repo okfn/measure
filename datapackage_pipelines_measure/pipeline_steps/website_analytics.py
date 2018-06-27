@@ -14,7 +14,7 @@ def add_steps(steps: list, pipeline_id: str,
         'resource-name': 'latest-project-entries',
         'table': 'websiteanalytics',
         'engine': settings.get('DB_ENGINE'),
-        'distinct_on': ['project_id', 'domain', 'page_path', 'source']
+        'distinct_on': ['project_id', 'domain', 'source']
     }))
 
     if 'ga' in config:
