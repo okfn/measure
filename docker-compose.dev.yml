@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+  measure:
+    build: .
+    depends_on:
+      - db
+    ports:
+      - '5000:5000'
+    environment:
+      - MEASURE_DB_ENGINE=postgresql://postgres@db/postgres
+      - MEASURE_DEVELOPMENT=False
+    env_file:
+      - .env
+
+  db:
+    image: 'postgres:10-alpine'
+    expose:
+      - 5432
+    ports:
+      - "5432:5432"
+    volumes:
+      - ~/src/dockerfiles/measure_db/data:/var/lib/postgresql/data
