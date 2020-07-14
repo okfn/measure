@@ -7,7 +7,7 @@ config:
       entities:
         - "#frictionlessdata"
         - "#datapackages"
-        - "@okfnlabs"
+        - "@frictionlessd8a"
         - "url:frictionlessdata.io"
     facebook:
       pages:
